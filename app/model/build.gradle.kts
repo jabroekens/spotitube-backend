@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-	api("jakarta.validation:jakarta.validation-api")
+	implementation("jakarta.validation:jakarta.validation-api")
 }
 
 tasks {

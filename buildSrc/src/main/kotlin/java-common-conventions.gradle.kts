@@ -13,6 +13,8 @@ plugins {
 dependencies {
 	testImplementation(libs.findLibrary("equalsverifier").get())
 	testImplementation(libs.findLibrary("mockito-core").get())
+	testImplementation(libs.findLibrary("mockito-junit-jupiter").get())
+	testImplementation(testFixtures(project(":app:model")))
 
 	testFixturesApi(project(":app:model"))
 }
