@@ -1,0 +1,16 @@
+[versions]
+java = "17"
+junit-jupiter = "5.7.1"
+
+[libraries]
+jakartaee-bom = { module = "jakarta.platform:jakarta.jakartaee-bom", version = "10.0.0" }
+
+# Convention plugins
+jacoco-core = { module = "org.jacoco:org.jacoco.core", version = "0.8.9" }
+
+# Testing
+mockito-core = { module = "org.mockito:mockito-core", version = "4.9.0" }
+equalsverifier = { module = "nl.jqno.equalsverifier:equalsverifier", version = "3.11.1" }
+
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version = "1.18.0" }
+postgresql = { module = "org.postgresql:postgresql", version = "42.5.0" }
