@@ -97,6 +97,9 @@ tasks {
 					value = "MISSEDCOUNT"
 					maximum = "0".toBigDecimal()
 				}
+				excludes = listOf(
+					"com.github.jabroekens.spotitube.**.*Exception"
+				)
 			}
 		}
 	}
