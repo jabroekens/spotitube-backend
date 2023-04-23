@@ -1,11 +1,16 @@
 [versions]
 java = "17"
 junit-jupiter = "5.7.1"
+jjwt = "0.11.5"
 mockito = "5.3.1"
 
 [libraries]
 jakartaee-bom = { module = "jakarta.platform:jakarta.jakartaee-bom", version = "10.0.0" }
 spring-security-crypto = { module = "org.springframework.security:spring-security-crypto", version = "6.0.2" }
+
+jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
+jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
+jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 
 # Convention plugins
 jacoco-core = { module = "org.jacoco:org.jacoco.core", version = "0.8.9" }

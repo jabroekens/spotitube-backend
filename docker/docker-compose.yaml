@@ -13,6 +13,9 @@ services:
     build:
       context: ..
       dockerfile: docker/backend/Dockerfile
+    environment:
+      JAVA_OPTS: -javaagent:lib/jacocoagent.jar=output=tcpserver,address=*
     ports:
       - '8080:8080'
       - '8443:8443'
+      - '6300:6300'
