@@ -1,4 +1,4 @@
-FROM arm64v8/tomee:9.0.0-jre17-microprofile
+FROM tomee:9.0.0-jre17-microprofile
 RUN apt update && \
     apt install unzip && \
     curl -LO https://search.maven.org/remotecontent?filepath=org/jacoco/jacoco/0.8.9/jacoco-0.8.9.zip && \

@@ -14,7 +14,8 @@ abstract class IntegrationTestBase {
     )
       .withExposedService("backend", 8080)
       .withExposedService("db", 5432)
-      .withLocalCompose(true);
+      .withLocalCompose(true)
+      .withOptions("--compatibility");
 
     protected static final HttpClient httpClient;
 

@@ -26,7 +26,7 @@ tasks {
 		port.set(6300)
 
 		val it by integrationTest
-		testReportTask.set(it.extensions.getByType(JacocoTaskExtension::class))
+		destinationFile.set(it.extensions.getByType(JacocoTaskExtension::class).destinationFile)
 	}
 
 	integrationTest {

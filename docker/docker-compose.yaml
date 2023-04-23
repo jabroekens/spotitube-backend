@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   db:
-    image: arm64v8/postgres:15.2
+    image: postgres:15.2
     environment:
       POSTGRES_USER: spotitube
       POSTGRES_PASSWORD: spotitube
