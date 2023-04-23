@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  db:
+    image: arm64v8/postgres:15.2
+    environment:
+      POSTGRES_USER: spotitube
+      POSTGRES_PASSWORD: spotitube
+    volumes:
+      - './db/:/docker-entrypoint-initdb.d/:ro'
+    ports:
+      - '5432:5432'
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/backend/Dockerfile
+    ports:
+      - '8080:8080'
+      - '8443:8443'

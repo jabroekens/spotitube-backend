@@ -1,0 +1,8 @@
+*
+!.dockerignore
+!gradle/
+!gradlew
+!buildSrc/
+!app/
+!settings.gradle.kts
+!docker/

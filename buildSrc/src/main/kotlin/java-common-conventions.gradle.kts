@@ -34,6 +34,7 @@ testing {
 		register<JvmTestSuite>("integrationTest") {
 			dependencies {
 				implementation(project())
+				implementation(testFixtures(project(":app:model")))
 				implementation(project.dependencies.testFixtures(project))
 			}
 
