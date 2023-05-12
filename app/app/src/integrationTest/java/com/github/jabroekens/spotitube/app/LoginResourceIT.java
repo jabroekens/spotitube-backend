@@ -1,6 +1,7 @@
 package com.github.jabroekens.spotitube.app;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
 class LoginResourceIT extends IntegrationTestBase {
@@ -8,7 +9,7 @@ class LoginResourceIT extends IntegrationTestBase {
     @Test
     void canLoginSuccesfullyWithCorrectCredentials() throws IOException, InterruptedException {
         var response = httpClient.post("/login", "{\"user\":\"john\",\"password\":\"password\"}");
-        assertResponse(200, "{\"token\":\"TODO\",\"user\":\"John Doe\"}", response);
+        assertResponse(200, Pattern.compile("\\{\"token\":\".+?\",\"user\":\"John Doe\"}"), response);
     }
 
     @Test

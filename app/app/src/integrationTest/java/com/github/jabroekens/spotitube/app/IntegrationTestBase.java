@@ -2,10 +2,12 @@ package com.github.jabroekens.spotitube.app;
 
 import java.io.File;
 import java.net.http.HttpResponse;
+import java.util.regex.Pattern;
 import org.testcontainers.containers.DockerComposeContainer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 abstract class IntegrationTestBase {
 
@@ -27,10 +29,17 @@ abstract class IntegrationTestBase {
         );
     }
 
-    protected static <T> void assertResponse(int statusCode, String body, HttpResponse<T> response) {
+    protected static void assertResponse(int statusCode, String body, HttpResponse<String> response) {
         assertAll(
           () -> assertEquals(statusCode, response.statusCode()),
           () -> assertEquals(body, response.body())
+        );
+    }
+
+    protected static void assertResponse(int statusCode, Pattern bodyPattern, HttpResponse<String> response) {
+        assertAll(
+          () -> assertEquals(statusCode, response.statusCode()),
+          () -> assertTrue(bodyPattern.matcher(response.body()).matches())
         );
     }
 

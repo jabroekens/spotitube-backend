@@ -1,5 +1,6 @@
 package com.github.jabroekens.spotitube.app.resource.user;
 
+import com.github.jabroekens.spotitube.app.config.security.JwtUtil;
 import com.github.jabroekens.spotitube.service.api.user.UserService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;
@@ -18,7 +19,8 @@ public class LoginResource {
     @POST
     public Response login(LoginRequest loginRequest) {
         var user = userService.getUser(loginRequest.user(), loginRequest.password());
-        return Response.ok(new LoginResponse("TODO", user.getName())).build();
+        var token = JwtUtil.issueToken(user);
+        return Response.ok(new LoginResponse(token, user.getName())).build();
     }
 
 }
