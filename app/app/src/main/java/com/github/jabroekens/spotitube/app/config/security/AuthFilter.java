@@ -8,36 +8,43 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 import java.security.KeyStoreException;
+import java.util.Optional;
 
 @Secured
 @Provider
 public class AuthFilter implements ContainerRequestFilter {
 
 	private static final String AUTH_SCHEME = "Bearer";
+	private static final String TOKEN_PARAM = "token";
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) {
-		var authHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-		var token = extractToken(authHeader);
+		var token = extractTokenFromHeader(requestContext)
+		  .or(() -> extractTokenFromQueryParams(requestContext));
 
-		if (token == null) {
+		if (token.isEmpty()) {
 			abortWithUnauthorized(requestContext);
 			return;
 		}
 
 		try {
-			JwtUtil.validateToken(token);
+			JwtUtil.validateToken(token.get());
 		} catch (JwtException | KeyStoreException e) {
 			abortWithUnauthorized(requestContext);
 		}
 	}
 
-	private String extractToken(String authHeader) {
+	private Optional<String> extractTokenFromHeader(ContainerRequestContext requestContext) {
+		var authHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 		if (!Strings.startsWithIgnoreCase(authHeader, AUTH_SCHEME + " ")) {
-			return null;
+			return Optional.empty();
 		}
 
-		return authHeader.substring(AUTH_SCHEME.length()).trim();
+		return Optional.of(authHeader.substring(AUTH_SCHEME.length()).trim());
+	}
+
+	private Optional<String> extractTokenFromQueryParams(ContainerRequestContext requestContext) {
+		return Optional.of(requestContext.getUriInfo().getQueryParameters().getFirst(TOKEN_PARAM));
 	}
 
 	private void abortWithUnauthorized(ContainerRequestContext requestContext) {
