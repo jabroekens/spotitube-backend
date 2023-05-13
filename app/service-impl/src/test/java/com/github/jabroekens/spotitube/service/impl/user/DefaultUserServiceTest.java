@@ -1,6 +1,6 @@
 package com.github.jabroekens.spotitube.service.impl.user;
 
-import com.github.jabroekens.spotitube.model.user.Users;
+import com.github.jabroekens.spotitube.model.Users;
 import com.github.jabroekens.spotitube.persistence.api.UserRepository;
 import com.github.jabroekens.spotitube.service.api.EntityNotFoundException;
 import com.github.jabroekens.spotitube.service.api.user.IncorrectPasswordException;
@@ -28,7 +28,7 @@ class DefaultUserServiceTest {
 	private PasswordEncoder passwordEncoder;
 
 	@InjectMocks
-	private DefaultUserService userService;
+	private DefaultUserService sut;
 
 	@Test
 	void getsUserWhenGivenCorrectCredentials() {
@@ -36,7 +36,7 @@ class DefaultUserServiceTest {
 		when(passwordEncoder.matches(any(), any())).thenReturn(true);
 
 		var password = Users.DEFAULT.getPasswordHash();
-		var user = userService.getUser(Users.DEFAULT.getId(), password);
+		var user = sut.getUser(Users.DEFAULT.getId(), password);
 
 		assertEquals(Users.DEFAULT, user);
 		verify(passwordEncoder).matches(Users.DEFAULT.getPasswordHash(), password);
@@ -47,7 +47,7 @@ class DefaultUserServiceTest {
 		when(userRepository.findById(any())).thenReturn(Optional.of(Users.DEFAULT));
 
 		var password = Users.DEFAULT.getPasswordHash() + "1";
-		assertThrows(IncorrectPasswordException.class, () -> userService.getUser(Users.DEFAULT.getId(), password));
+		assertThrows(IncorrectPasswordException.class, () -> sut.getUser(Users.DEFAULT.getId(), password));
 
 		verify(passwordEncoder).matches(password, Users.DEFAULT.getPasswordHash());
 	}
@@ -55,7 +55,10 @@ class DefaultUserServiceTest {
 	@Test
 	void throwsExceptionWhenUserNotFound() {
 		when(userRepository.findById(any())).thenReturn(Optional.empty());
-		assertThrows(EntityNotFoundException.class, () -> userService.getUser(Users.DEFAULT.getId(), ""));
+		assertThrows(
+		  EntityNotFoundException.class,
+		  () -> sut.getUser(Users.DEFAULT.getId(), Users.DEFAULT.getPasswordHash())
+		);
 	}
 
 }

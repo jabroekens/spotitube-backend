@@ -1,6 +1,6 @@
 package com.github.jabroekens.spotitube.persistence.impl;
 
-import com.github.jabroekens.spotitube.model.user.Users;
+import com.github.jabroekens.spotitube.model.Users;
 import com.github.jabroekens.spotitube.persistence.api.UserRepository;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,8 +48,8 @@ class UserRepositoryIT extends IntegrationTestBase {
 
     @Test
     void removesUserIfExists() {
-        assertTrue(sut.remove(Users.DEFAULT));
-        assertFalse(sut.remove(Users.DEFAULT));
+        assertTrue(sut.remove(Users.DEFAULT.getId()));
+        assertFalse(sut.remove(Users.DEFAULT.getId()));
     }
 
     @Test

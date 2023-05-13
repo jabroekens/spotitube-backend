@@ -2,7 +2,7 @@ package com.github.jabroekens.spotitube.model.track.playlist;
 
 import com.github.jabroekens.spotitube.model.NotNullAndValid;
 import jakarta.validation.constraints.PositiveOrZero;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * A collection of {@link Playlist playlists}.
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public record PlaylistCollection(
 	@PositiveOrZero int length,
-	List<@NotNullAndValid Playlist> playlists
+	Collection<@NotNullAndValid Playlist> playlists
 ) {
 
 }

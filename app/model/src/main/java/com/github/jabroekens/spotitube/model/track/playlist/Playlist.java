@@ -6,6 +6,7 @@ import com.github.jabroekens.spotitube.model.track.Track;
 import com.github.jabroekens.spotitube.model.user.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ public class Playlist {
 		this.id = id;
 		this.name = name;
 		this.owner = owner;
-		this.tracks = tracks;
+		this.tracks = new LinkedList<>(tracks);
 	}
 
 	@Id
@@ -56,7 +57,7 @@ public class Playlist {
 	 * @return {@code true} if the track was added, {@code false} otherwise.
 	 */
 	public boolean addTrack(@NotNullAndValid Track track) {
-		return getTracks().add(track);
+		return tracks.add(track);
 	}
 
 	/**
@@ -66,7 +67,7 @@ public class Playlist {
 	 * @return {@code true} if the track was removed, {@code false} false otherwise.
 	 */
 	public boolean removeTrack(String trackId) {
-		return getTracks().removeIf(t -> t.getId().equals(trackId));
+		return tracks.removeIf(t -> t.getId().equals(trackId));
 	}
 
 }

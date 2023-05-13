@@ -22,17 +22,19 @@ interface Repository<T, K> {
 	/**
 	 * Saves {@code t} to this repository.
 	 *
-	 * @param t the {@link T} to be added.
+	 * @param t the {@link T} to be saved.
 	 *
 	 * @return the saved instance of {@code t}.
 	 */
 	T save(T t);
 
 	/**
-	 * Removes {@code t} from this repository.
+	 * Removes {@link T} whose ID is {@code k} from this repository.
 	 *
-	 * @param t the {@link T} to be removed.
+	 * @param k the ID of the {@link T} to be removed.
+	 *
+	 * @return {@code true} if a {@link T} whose ID is {@code k} was removed, {@code false} otherwise.
 	 */
-	boolean remove(T t);
+	boolean remove(K k);
 
 }

@@ -122,12 +122,12 @@ public class DefaultUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean remove(User user) {
+    public boolean remove(String id) {
         try (
           var conn = dataSource.getConnection();
           var stmt = withParams(
             conn.prepareStatement("DELETE FROM \"User\" WHERE id=?"),
-            user.getId()
+            id
           );
         ) {
             return stmt.executeUpdate() > 0;

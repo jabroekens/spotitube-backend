@@ -1,6 +1,8 @@
-package com.github.jabroekens.spotitube.model.user;
+package com.github.jabroekens.spotitube.model;
 
-public class Users {
+import com.github.jabroekens.spotitube.model.user.User;
+
+public final class Users {
 
     public static final User DEFAULT = new User("john", "", "John Doe");
     public static final User DEFAULT_CHANGED_NAME = new User(DEFAULT);
