@@ -1,5 +1,6 @@
 package com.github.jabroekens.spotitube.model.track.playlist;
 
+import com.github.jabroekens.spotitube.model.Entity;
 import com.github.jabroekens.spotitube.model.NotNullAndValid;
 import com.github.jabroekens.spotitube.model.track.Id;
 import com.github.jabroekens.spotitube.model.track.Track;
@@ -8,27 +9,54 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * A playlist can consist of one or more {@link Track track(s)}.
  */
+@Entity
 public class Playlist {
 
-	private final String id;
+	private int id;
 	private String name;
-	private final User owner;
+	private User owner;
 	private final List<Track> tracks;
 
-	public Playlist(String id, String name, User owner, List<Track> tracks) {
+	/**
+	 * @deprecated Internal no-args constructor used by framework.
+	 */
+	@Deprecated
+	protected Playlist() {
+		this.tracks = new LinkedList<>();
+	}
+
+	public Playlist(int id, String name, User owner, List<Track> tracks) {
 		this.id = id;
 		this.name = name;
 		this.owner = owner;
 		this.tracks = new LinkedList<>(tracks);
 	}
 
+	/**
+	 * Returns a deep copy of {@code playlist}.
+	 */
+	public Playlist(Playlist playlist) {
+		this.id = playlist.id;
+		this.name = playlist.name;
+		this.owner = new User(playlist.owner);
+		this.tracks = playlist.getTracks().stream()
+		  .map(Track::new)
+		  .collect(Collectors.toCollection(LinkedList::new));
+	}
+
 	@Id
 	public String getId() {
-		return id;
+		return String.valueOf(id);
+	}
+
+	public void setId(@Id int id) {
+		this.id = id;
 	}
 
 	@NotBlank
@@ -64,10 +92,23 @@ public class Playlist {
 	 * Removes the track with ID {@code trackId} from this playlist.
 	 *
 	 * @param trackId the ID of the track to be removed.
+	 *
 	 * @return {@code true} if the track was removed, {@code false} false otherwise.
 	 */
 	public boolean removeTrack(String trackId) {
 		return tracks.removeIf(t -> t.getId().equals(trackId));
+	}
+
+	@Override
+	public final boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Playlist playlist)) return false;
+		return Objects.equals(getId(), playlist.getId());
+	}
+
+	@Override
+	public final int hashCode() {
+		return Objects.hash(getId());
 	}
 
 }

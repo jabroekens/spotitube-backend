@@ -1,5 +1,6 @@
 package com.github.jabroekens.spotitube.model.user;
 
+import com.github.jabroekens.spotitube.model.Entity;
 import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Objects;
@@ -7,13 +8,19 @@ import java.util.Objects;
 /**
  * A user can manage one or more {@link Playlist playlist(s)}.
  */
+@Entity
 public class User {
 
-    private final String id;
-
+    private String id;
     private String passwordHash;
-
     private String name;
+
+    /**
+     * @deprecated Internal no-args constructor used by framework.
+     */
+    @Deprecated
+    protected User() {
+    }
 
     public User(String id, String passwordHash, String name) {
         this.id = id;
@@ -21,6 +28,9 @@ public class User {
         this.name = name;
     }
 
+    /**
+     * Returns a deep copy of {@code user}.
+     */
     public User(User user) {
         this.id = user.id;
         this.passwordHash = user.passwordHash;

@@ -1,5 +1,6 @@
 package com.github.jabroekens.spotitube.model.track;
 
+import com.github.jabroekens.spotitube.model.Entity;
 import com.github.jabroekens.spotitube.model.NotNullAndValid;
 import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
 import jakarta.validation.Valid;
@@ -7,22 +8,33 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * A track is a video or song that can be part of a {@link Playlist}.
  */
+@Entity
 public class Track {
 
-	private final String id;
-	private final String title;
-	private final Performer performer;
-	private final int duration;
-	private final Album album;
-	private final int playCount;
-	private final ZonedDateTime publicationDate;
-	private final String description;
-	private final boolean offlineAvailable;
+	private int id;
+	private String title;
+	private Performer performer;
+	private int duration;
+	private boolean offlineAvailable;
+
+	private Album album;
+
+	private int playCount;
+	private ZonedDateTime publicationDate;
+	private String description;
+
+	/**
+	 * @deprecated Internal no-args constructor used by framework.
+	 */
+	@Deprecated
+	protected Track() {
+	}
 
 	/**
 	 * Creates a track for a song.
@@ -35,7 +47,7 @@ public class Track {
 	 * @param offlineAvailable if the track is available for offline use.
 	 */
 	public Track(
-		String id,
+		int id,
 		String title,
 		Performer performer,
 		int duration,
@@ -53,33 +65,50 @@ public class Track {
 	 * @param performer        the publisher of the video.
 	 * @param duration         the duration of the video in seconds.
 	 * @param playCount        the amount of times the video has been played.
-	 * @param publicationDate  the publication date of the video.
-	 * @param description      the description of the video.
+	 * @param publicationDate  the publication date of the video. May be {@code null}.
+	 * @param description      the description of the video. May be {@code null}.
 	 * @param offlineAvailable if the track is available for offline use.
 	 */
 	public Track(
-		String id,
-		String title,
-		Performer performer,
-		int duration,
-		int playCount,
-		ZonedDateTime publicationDate,
-		String description,
-		boolean offlineAvailable
+	  int id,
+	  String title,
+	  Performer performer,
+	  int duration,
+	  int playCount,
+	  ZonedDateTime publicationDate,
+	  String description,
+	  boolean offlineAvailable
 	) {
 		this(id, title, performer, duration, playCount, null, publicationDate, description, offlineAvailable);
 	}
 
+	/**
+	 * Returns a deep copy of {@code track}.
+	 */
+	public Track(Track track) {
+		this.id = track.id;
+		this.title = track.title;
+		this.performer = new Performer(track.performer);
+		this.duration = track.duration;
+		this.offlineAvailable = track.offlineAvailable;
+
+		this.album = track.album != null ? new Album(track.album) : null;
+
+		this.playCount = track.playCount;
+		this.publicationDate = track.publicationDate;
+		this.description = track.description;
+	}
+
 	private Track(
-		String id,
-		String title,
-		Performer performer,
-		int duration,
-		int playCount,
-		Album album,
-		ZonedDateTime publicationDate,
-		String description,
-		boolean offlineAvailable
+	  int id,
+	  String title,
+	  Performer performer,
+	  int duration,
+	  int playCount,
+	  Album album,
+	  ZonedDateTime publicationDate,
+	  String description,
+	  boolean offlineAvailable
 	) {
 		this.id = id;
 		this.title = title;
@@ -94,7 +123,7 @@ public class Track {
 
 	@Id
 	public String getId() {
-		return id;
+		return String.valueOf(id);
 	}
 
 	@NotBlank
@@ -135,6 +164,18 @@ public class Track {
 
 	public boolean isOfflineAvailable() {
 		return offlineAvailable;
+	}
+
+	@Override
+	public final boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Track track)) return false;
+		return Objects.equals(getId(), track.getId());
+	}
+
+	@Override
+	public final int hashCode() {
+		return Objects.hash(getId());
 	}
 
 }

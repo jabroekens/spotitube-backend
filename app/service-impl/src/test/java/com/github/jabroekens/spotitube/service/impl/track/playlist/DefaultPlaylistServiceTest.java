@@ -132,7 +132,7 @@ class DefaultPlaylistServiceTest {
 	@Test
 	void getsTracksForPlaylist() {
 		var playlist = spy(Playlists.EMPTY);
-		var tracks = List.of(Tracks.OFFLINE_AVAILABLE_SONG);
+		var tracks = List.of(Tracks.AMERICAN_LOVE);
 
 		when(playlistRepository.findById(any())).thenReturn(Optional.of(playlist));
 		when(playlist.getTracks()).thenReturn(tracks);
@@ -149,7 +149,7 @@ class DefaultPlaylistServiceTest {
 	@Test
 	void addsExistentTrackToExistentPlaylist() {
 		var existingPlaylist = spy(Playlists.EMPTY);
-		var track = Tracks.OFFLINE_AVAILABLE_SONG;
+		var track = Tracks.AMERICAN_LOVE;
 		var modifiedPlaylist = spy(Playlists.EMPTY);
 		var tracks = List.of(track);
 
@@ -171,7 +171,7 @@ class DefaultPlaylistServiceTest {
 
 		assertThrows(
 		  EntityNotFoundException.class,
-		  () -> sut.addTrackToPlaylist(Playlists.EMPTY.getId(), Tracks.OFFLINE_AVAILABLE_SONG.getId())
+		  () -> sut.addTrackToPlaylist(Playlists.EMPTY.getId(), Tracks.AMERICAN_LOVE.getId())
 		);
 
 		verifyNoMoreInteractions(playlistRepository);
@@ -185,7 +185,7 @@ class DefaultPlaylistServiceTest {
 
 		assertThrows(
 		  EntityNotFoundException.class,
-		  () -> sut.addTrackToPlaylist(playlist.getId(), Tracks.OFFLINE_AVAILABLE_SONG.getId())
+		  () -> sut.addTrackToPlaylist(playlist.getId(), Tracks.AMERICAN_LOVE.getId())
 		);
 
 		verifyNoMoreInteractions(playlistRepository);
@@ -194,7 +194,7 @@ class DefaultPlaylistServiceTest {
 	@Test
 	void removesExistentTrackFromExistentPlaylist() {
 		var existingPlaylist = spy(Playlists.EMPTY);
-		var track = Tracks.OFFLINE_AVAILABLE_SONG;
+		var track = Tracks.AMERICAN_LOVE;
 		var modifiedPlaylist = spy(Playlists.EMPTY);
 		var tracks = List.of(track);
 
@@ -216,7 +216,7 @@ class DefaultPlaylistServiceTest {
 
 		assertThrows(
 		  EntityNotFoundException.class,
-		  () -> sut.removeTrackFromPlaylist(Playlists.EMPTY.getId(), Tracks.OFFLINE_AVAILABLE_SONG.getId())
+		  () -> sut.removeTrackFromPlaylist(Playlists.EMPTY.getId(), Tracks.AMERICAN_LOVE.getId())
 		);
 
 		verifyNoMoreInteractions(playlistRepository);
@@ -231,7 +231,7 @@ class DefaultPlaylistServiceTest {
 
 		assertThrows(
 		  EntityNotFoundException.class,
-		  () -> sut.removeTrackFromPlaylist(playlist.getId(), Tracks.OFFLINE_AVAILABLE_SONG.getId())
+		  () -> sut.removeTrackFromPlaylist(playlist.getId(), Tracks.AMERICAN_LOVE.getId())
 		);
 
 		verifyNoMoreInteractions(playlistRepository);

@@ -13,7 +13,6 @@ abstract class IntegrationTestBase {
     private final PostgreSQLContainer<?> dbContainer = new PostgreSQLContainer<>("postgres:15.2")
       .withUsername("postgres")
       .withPassword("postgres")
-      // Users.DEFAULT is inserted by `create_tables.sql`
       .withFileSystemBind("../../docker/db/", "/docker-entrypoint-initdb.d/");
 
     protected DataSource getDataSource() {
