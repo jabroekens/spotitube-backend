@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 import static com.github.jabroekens.spotitube.persistence.impl.JdbcHelper.withParams;
 
 @ApplicationScoped
-public class DefaultUserRepository implements UserRepository {
+public class JdbcUserRepository implements UserRepository {
 
     private static final String FIND_ALL_USERS = """
 	  SELECT id AS User_id, passwordHash AS User_passwordHash, name AS User_name

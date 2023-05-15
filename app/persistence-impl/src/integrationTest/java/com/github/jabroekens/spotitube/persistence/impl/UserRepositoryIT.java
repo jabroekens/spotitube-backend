@@ -20,7 +20,7 @@ class UserRepositoryIT extends IntegrationTestBase {
     // Users.JOHN_DOE is inserted by `create_tables.sql`
     @BeforeEach
     void setUp() {
-        var repository = new DefaultUserRepository();
+        var repository = new JdbcUserRepository();
         repository.setDataSource(getDataSource());
         sut = repository;
     }

@@ -17,7 +17,7 @@ import static com.github.jabroekens.spotitube.persistence.impl.JdbcHelper.withBa
 import static com.github.jabroekens.spotitube.persistence.impl.JdbcHelper.withParams;
 
 @ApplicationScoped
-public class DefaultPlaylistRepository implements PlaylistRepository {
+public class JdbcPlaylistRepository implements PlaylistRepository {
 
 	private static final String FIND_ALL_PLAYLISTS = """
 	  SELECT p.id AS Playlist_id, p.name AS Playlist_name,

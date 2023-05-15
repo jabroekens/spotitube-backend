@@ -25,7 +25,7 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	// Playlists.EMPTY and Playlists.FAVORITE (and related information) are inserted by `create_tables.sql`
 	@BeforeEach
 	void setUp() {
-		var repository = new DefaultPlaylistRepository();
+		var repository = new JdbcPlaylistRepository();
 		repository.setDataSource(getDataSource());
 		sut = repository;
 	}
