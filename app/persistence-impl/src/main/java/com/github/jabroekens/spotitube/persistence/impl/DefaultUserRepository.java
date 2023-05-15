@@ -16,6 +16,17 @@ import static com.github.jabroekens.spotitube.persistence.impl.JdbcHelper.withPa
 @ApplicationScoped
 public class DefaultUserRepository implements UserRepository {
 
+    private static final String FIND_ALL_USERS = """
+	  SELECT id AS User_id, passwordHash AS User_passwordHash, name AS User_name
+	  FROM "User"
+	  """;
+
+    private static final String SAVE_USER = """
+	  INSERT INTO "User" (id, passwordHash, name)
+	  VALUES (?, ?, ?)
+	  ON CONFLICT (id) DO UPDATE SET passwordHash=?, name=?
+	  """;
+
     private DataSource dataSource;
 
     @Resource(name = "SpotitubeDb")
@@ -30,16 +41,10 @@ public class DefaultUserRepository implements UserRepository {
         try (
           var conn = dataSource.getConnection();
           var stmt = conn.createStatement();
-          var results = stmt.executeQuery("SELECT id, passwordHash, name FROM \"User\"")
+          var results = stmt.executeQuery(FIND_ALL_USERS)
         ) {
             while (results.next()) {
-                users.add(
-                  new User(
-                    results.getString("id"),
-                    results.getString("passwordHash"),
-                    results.getString("name")
-                  )
-                );
+                users.add(JdbcHelper.toEntity(User.class, results));
             }
         } catch (SQLException e) {
             throw new PersistenceException(e);
@@ -53,25 +58,15 @@ public class DefaultUserRepository implements UserRepository {
         try (
           var conn = dataSource.getConnection();
           var stmt = withParams(
-            conn.prepareStatement("SELECT id, passwordHash, name FROM \"User\" WHERE id=?"),
+            conn.prepareStatement(FIND_ALL_USERS + " WHERE id=?"),
             userId
           );
           var results = stmt.executeQuery()
         ) {
-            if (results.next()) {
-                return Optional.of(
-                  new User(
-                    results.getString("id"),
-                    results.getString("passwordHash"),
-                    results.getString("name")
-                  )
-                );
-            }
+            return Optional.ofNullable(results.next() ? JdbcHelper.toEntity(User.class, results) : null);
         } catch (SQLException e) {
             throw new PersistenceException(e);
         }
-
-        return Optional.empty();
     }
 
     @Override
@@ -79,25 +74,15 @@ public class DefaultUserRepository implements UserRepository {
         try (
           var conn = dataSource.getConnection();
           var stmt = withParams(
-            conn.prepareStatement("SELECT id, passwordHash, name FROM \"User\" WHERE name=?"),
+            conn.prepareStatement(FIND_ALL_USERS + " WHERE name=?"),
             name
           );
           var results = stmt.executeQuery()
         ) {
-            if (results.next()) {
-                return Optional.of(
-                  new User(
-                    results.getString("id"),
-                    results.getString("passwordHash"),
-                    results.getString("name")
-                  )
-                );
-            }
+            return Optional.ofNullable(results.next() ? JdbcHelper.toEntity(User.class, results) : null);
         } catch (SQLException e) {
             throw new PersistenceException(e);
         }
-
-        return Optional.empty();
     }
 
     @Override
@@ -105,14 +90,10 @@ public class DefaultUserRepository implements UserRepository {
         try (
           var conn = dataSource.getConnection();
           var stmt = withParams(
-            conn.prepareStatement("""
-              INSERT INTO "User" (id, passwordHash, name)
-              VALUES (?, ?, ?)
-              ON CONFLICT (id) DO UPDATE SET passwordHash=?, name=?
-              """),
+            conn.prepareStatement(SAVE_USER),
             user.getId(), user.getPasswordHash(), user.getName(),
             user.getPasswordHash(), user.getName()
-          );
+          )
         ) {
             stmt.executeUpdate();
             return user;
@@ -125,10 +106,7 @@ public class DefaultUserRepository implements UserRepository {
     public boolean remove(String id) {
         try (
           var conn = dataSource.getConnection();
-          var stmt = withParams(
-            conn.prepareStatement("DELETE FROM \"User\" WHERE id=?"),
-            id
-          );
+          var stmt = withParams(conn.prepareStatement("DELETE FROM \"User\" WHERE id=?"), id)
         ) {
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
