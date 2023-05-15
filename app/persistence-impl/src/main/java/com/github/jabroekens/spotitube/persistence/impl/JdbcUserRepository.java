@@ -96,7 +96,7 @@ public class JdbcUserRepository implements UserRepository {
           )
         ) {
             stmt.executeUpdate();
-            return user;
+            return new User(user);
         } catch (SQLException e) {
             throw new PersistenceException(e);
         }

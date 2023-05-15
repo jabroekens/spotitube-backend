@@ -121,6 +121,8 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 	@Override
 	public Playlist save(Playlist playlist) {
 		try (var conn = dataSource.getConnection()) {
+			var result = new Playlist(playlist);
+
 			try (
 			  var playlistStmt = withParams(
 				conn.prepareStatement(SAVE_PLAYLIST, Statement.RETURN_GENERATED_KEYS),
@@ -145,11 +147,11 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 						trackStmt.executeUpdate();
 					}
 
-					playlist.setId(playlistId);
+					result.setId(playlistId);
 				}
 			}
 
-			return playlist;
+			return result;
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
