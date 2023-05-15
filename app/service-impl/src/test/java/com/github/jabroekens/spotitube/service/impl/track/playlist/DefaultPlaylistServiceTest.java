@@ -47,7 +47,7 @@ class DefaultPlaylistServiceTest {
 		var playlistCollection = sut.createPlaylist(playlist);
 		assertAll(
 		  () -> assertEquals(1, playlistCollection.length()),
-		  () -> assertIterableEquals(playlists, playlistCollection.playlists())
+		  () -> assertEquals(playlists, playlistCollection.playlists())
 		);
 
 		verify(playlistRepository).save(playlist);
@@ -72,7 +72,7 @@ class DefaultPlaylistServiceTest {
 		var playlistCollection = sut.getAllPlaylists();
 		assertAll(
 		  () -> assertEquals(1, playlistCollection.length()),
-		  () -> assertIterableEquals(playlists, playlistCollection.playlists())
+		  () -> assertEquals(playlists, playlistCollection.playlists())
 		);
 
 		verify(playlistRepository).findAll();
@@ -89,7 +89,7 @@ class DefaultPlaylistServiceTest {
 		var playlistCollection = sut.modifyPlaylist(playlist);
 		assertAll(
 		  () -> assertEquals(1, playlistCollection.length()),
-		  () -> assertIterableEquals(playlists, playlistCollection.playlists())
+		  () -> assertEquals(playlists, playlistCollection.playlists())
 		);
 
 		verify(playlistRepository).save(playlist);
@@ -116,7 +116,7 @@ class DefaultPlaylistServiceTest {
 		var playlistCollection = sut.removePlaylist(playlist.getId());
 		assertAll(
 		  () -> assertEquals(1, playlistCollection.length()),
-		  () -> assertIterableEquals(playlists, playlistCollection.playlists())
+		  () -> assertEquals(playlists, playlistCollection.playlists())
 		);
 
 		verify(playlistRepository).remove(playlist.getId());
