@@ -38,7 +38,7 @@ class DefaultPlaylistServiceTest {
 
 	@Test
 	void createsPlaylistWhenNonexistent() {
-		var playlist = Playlists.EMPTY;
+		var playlist = Playlists.Empty();
 		var playlists = List.of(playlist);
 
 		when(playlistRepository.findById(any())).thenReturn(Optional.empty());
@@ -56,7 +56,7 @@ class DefaultPlaylistServiceTest {
 
 	@Test
 	void throwsExceptionWhenCreatingExistentPlaylist() {
-		var playlist = Playlists.EMPTY;
+		var playlist = Playlists.Empty();
 		when(playlistRepository.findById(any())).thenReturn(Optional.of(playlist));
 
 		assertThrows(EntityExistsException.class, () -> sut.createPlaylist(playlist));
@@ -66,7 +66,7 @@ class DefaultPlaylistServiceTest {
 
 	@Test
 	void getsAllPlaylistsAndHasCorrectLength() {
-		var playlists = List.of(Playlists.EMPTY);
+		var playlists = List.of(Playlists.Empty());
 		when(playlistRepository.findAll()).thenReturn(playlists);
 
 		var playlistCollection = sut.getAllPlaylists();
@@ -80,7 +80,7 @@ class DefaultPlaylistServiceTest {
 
 	@Test
 	void modifiesPlaylistWhenExistent() {
-		var playlist = Playlists.EMPTY;
+		var playlist = Playlists.Empty();
 		var playlists = List.of(playlist);
 
 		when(playlistRepository.findById(any())).thenReturn(Optional.of(playlist));
@@ -100,14 +100,14 @@ class DefaultPlaylistServiceTest {
 	void throwsExceptionWhenModifyingNonexistentPlaylist() {
 		when(playlistRepository.findById(any())).thenReturn(Optional.empty());
 
-		assertThrows(EntityNotFoundException.class, () -> sut.modifyPlaylist(Playlists.EMPTY));
+		assertThrows(EntityNotFoundException.class, () -> sut.modifyPlaylist(Playlists.Empty()));
 
 		verifyNoMoreInteractions(playlistRepository);
 	}
 
 	@Test
 	void removesPlaylistWhenExistent() {
-		var playlist = Playlists.EMPTY;
+		var playlist = Playlists.Empty();
 		var playlists = List.of(playlist);
 
 		when(playlistRepository.remove(any())).thenReturn(true);
@@ -126,13 +126,13 @@ class DefaultPlaylistServiceTest {
 	@Test
 	void throwsExceptionWhenRemovingNonexistentPlaylist() {
 		when(playlistRepository.remove(any())).thenReturn(false);
-		assertThrows(EntityNotFoundException.class, () -> sut.removePlaylist(Playlists.EMPTY.getId()));
+		assertThrows(EntityNotFoundException.class, () -> sut.removePlaylist(Playlists.Empty().getId()));
 	}
 
 	@Test
 	void getsTracksForPlaylist() {
-		var playlist = spy(Playlists.EMPTY);
-		var tracks = List.of(Tracks.AMERICAN_LOVE);
+		var playlist = spy(Playlists.Empty());
+		var tracks = List.of(Tracks.AmericanLove());
 
 		when(playlistRepository.findById(any())).thenReturn(Optional.of(playlist));
 		when(playlist.getTracks()).thenReturn(tracks);
@@ -143,14 +143,14 @@ class DefaultPlaylistServiceTest {
 	@Test
 	void throwsExceptionWhenGettingTracksForNonexistentPlaylist() {
 		when(playlistRepository.findById(any())).thenReturn(Optional.empty());
-		assertThrows(EntityNotFoundException.class, () -> sut.getPlaylistTracks(Playlists.EMPTY.getId()));
+		assertThrows(EntityNotFoundException.class, () -> sut.getPlaylistTracks(Playlists.Empty().getId()));
 	}
 
 	@Test
 	void addsExistentTrackToExistentPlaylist() {
-		var existingPlaylist = spy(Playlists.EMPTY);
-		var track = Tracks.AMERICAN_LOVE;
-		var modifiedPlaylist = spy(Playlists.EMPTY);
+		var existingPlaylist = spy(Playlists.Empty());
+		var track = Tracks.AmericanLove();
+		var modifiedPlaylist = spy(Playlists.Empty());
 		var tracks = List.of(track);
 
 		when(playlistRepository.findById(any())).thenReturn(Optional.of(existingPlaylist));
@@ -171,7 +171,7 @@ class DefaultPlaylistServiceTest {
 
 		assertThrows(
 		  EntityNotFoundException.class,
-		  () -> sut.addTrackToPlaylist(Playlists.EMPTY.getId(), Tracks.AMERICAN_LOVE.getId())
+		  () -> sut.addTrackToPlaylist(Playlists.Empty().getId(), Tracks.AmericanLove().getId())
 		);
 
 		verifyNoMoreInteractions(playlistRepository);
@@ -179,13 +179,13 @@ class DefaultPlaylistServiceTest {
 
 	@Test
 	void throwsExceptionWhenAddingNonexistentTrackToPlaylist() {
-		var playlist = Playlists.EMPTY;
+		var playlist = Playlists.Empty();
 		when(playlistRepository.findById(any())).thenReturn(Optional.of(playlist));
 		when(trackRepository.findById(any())).thenReturn(Optional.empty());
 
 		assertThrows(
 		  EntityNotFoundException.class,
-		  () -> sut.addTrackToPlaylist(playlist.getId(), Tracks.AMERICAN_LOVE.getId())
+		  () -> sut.addTrackToPlaylist(playlist.getId(), Tracks.AmericanLove().getId())
 		);
 
 		verifyNoMoreInteractions(playlistRepository);
@@ -193,9 +193,9 @@ class DefaultPlaylistServiceTest {
 
 	@Test
 	void removesExistentTrackFromExistentPlaylist() {
-		var existingPlaylist = spy(Playlists.EMPTY);
-		var track = Tracks.AMERICAN_LOVE;
-		var modifiedPlaylist = spy(Playlists.EMPTY);
+		var existingPlaylist = spy(Playlists.Empty());
+		var track = Tracks.AmericanLove();
+		var modifiedPlaylist = spy(Playlists.Empty());
 		var tracks = List.of(track);
 
 		when(playlistRepository.findById(any())).thenReturn(Optional.of(existingPlaylist));
@@ -216,7 +216,7 @@ class DefaultPlaylistServiceTest {
 
 		assertThrows(
 		  EntityNotFoundException.class,
-		  () -> sut.removeTrackFromPlaylist(Playlists.EMPTY.getId(), Tracks.AMERICAN_LOVE.getId())
+		  () -> sut.removeTrackFromPlaylist(Playlists.Empty().getId(), Tracks.AmericanLove().getId())
 		);
 
 		verifyNoMoreInteractions(playlistRepository);
@@ -224,14 +224,14 @@ class DefaultPlaylistServiceTest {
 
 	@Test
 	void throwsExceptionWhenRemovingNonexistentTrackFromPlaylist() {
-		var playlist = spy(Playlists.EMPTY);
+		var playlist = spy(Playlists.Empty());
 
 		when(playlistRepository.findById(any())).thenReturn(Optional.of(playlist));
 		when(playlist.removeTrack(any())).thenReturn(false);
 
 		assertThrows(
 		  EntityNotFoundException.class,
-		  () -> sut.removeTrackFromPlaylist(playlist.getId(), Tracks.AMERICAN_LOVE.getId())
+		  () -> sut.removeTrackFromPlaylist(playlist.getId(), Tracks.AmericanLove().getId())
 		);
 
 		verifyNoMoreInteractions(playlistRepository);

@@ -4,12 +4,18 @@ import com.github.jabroekens.spotitube.model.user.User;
 
 public final class Users {
 
-    public static final User JOHN_DOE = new User("john", "", "John Doe");
-    public static final User JOHN_SMITH = new User(JOHN_DOE);
-    public static final User JANE_DOE = new User("jane", "", "Jane Doe");
+    public static User JohnDoe() {
+        return new User("john", "", "John Doe");
+    }
 
-    static {
-        JOHN_SMITH.setName("John Smith");
+    public static User JohnSmith() {
+        var u = JohnDoe();
+        u.setName("John Smith");
+        return u;
+    }
+
+    public static User JaneDoe() {
+        return new User("jane", "", "Jane Doe");
     }
 
 }

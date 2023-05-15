@@ -4,6 +4,8 @@ import com.github.jabroekens.spotitube.model.track.Album;
 
 public final class Albums {
 
-	public static final Album LOVETAP = new Album("Lovetap!");
+	public static Album Lovetap() {
+		return new Album("Lovetap!");
+	}
 
 }

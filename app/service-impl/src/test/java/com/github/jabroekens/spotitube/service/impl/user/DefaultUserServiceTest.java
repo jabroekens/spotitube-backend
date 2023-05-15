@@ -32,24 +32,24 @@ class DefaultUserServiceTest {
 
 	@Test
 	void getsUserWhenGivenCorrectCredentials() {
-		when(userRepository.findById(any())).thenReturn(Optional.of(Users.JOHN_DOE));
+		when(userRepository.findById(any())).thenReturn(Optional.of(Users.JohnDoe()));
 		when(passwordEncoder.matches(any(), any())).thenReturn(true);
 
-		var password = Users.JOHN_DOE.getPasswordHash();
-		var user = sut.getUser(Users.JOHN_DOE.getId(), password);
+		var password = Users.JohnDoe().getPasswordHash();
+		var user = sut.getUser(Users.JohnDoe().getId(), password);
 
-		assertEquals(Users.JOHN_DOE, user);
-		verify(passwordEncoder).matches(Users.JOHN_DOE.getPasswordHash(), password);
+		assertEquals(Users.JohnDoe(), user);
+		verify(passwordEncoder).matches(Users.JohnDoe().getPasswordHash(), password);
 	}
 
 	@Test
 	void throwsExceptionWhenGivenIncorrectCredentials() {
-		when(userRepository.findById(any())).thenReturn(Optional.of(Users.JOHN_DOE));
+		when(userRepository.findById(any())).thenReturn(Optional.of(Users.JohnDoe()));
 
-		var password = Users.JOHN_DOE.getPasswordHash() + "1";
-		assertThrows(IncorrectPasswordException.class, () -> sut.getUser(Users.JOHN_DOE.getId(), password));
+		var password = Users.JohnDoe().getPasswordHash() + "1";
+		assertThrows(IncorrectPasswordException.class, () -> sut.getUser(Users.JohnDoe().getId(), password));
 
-		verify(passwordEncoder).matches(password, Users.JOHN_DOE.getPasswordHash());
+		verify(passwordEncoder).matches(password, Users.JohnDoe().getPasswordHash());
 	}
 
 	@Test
@@ -57,7 +57,7 @@ class DefaultUserServiceTest {
 		when(userRepository.findById(any())).thenReturn(Optional.empty());
 		assertThrows(
 		  EntityNotFoundException.class,
-		  () -> sut.getUser(Users.JOHN_DOE.getId(), Users.JOHN_DOE.getPasswordHash())
+		  () -> sut.getUser(Users.JohnDoe().getId(), Users.JohnDoe().getPasswordHash())
 		);
 	}
 
