@@ -26,13 +26,15 @@ class UserRepositoryIT extends IntegrationTestBase {
     }
 
     @Test
-    void insertsNewUserSuccesfully() {
+    @Override
+    void savesSuccesfully() {
         var savedUser = sut.save(Users.JANE_DOE);
         assertEquals(Users.JANE_DOE, savedUser);
     }
 
     @Test
-    void updatesUserIfExists() {
+    @Override
+    void updatesIfExists() {
         sut.save(Users.JOHN_SMITH);
 
         var savedUser = sut.findById(Users.JOHN_DOE.getId());
@@ -49,13 +51,15 @@ class UserRepositoryIT extends IntegrationTestBase {
     }
 
     @Test
-    void removesUserIfExists() {
+    @Override
+    void removesIfExists() {
         assertTrue(sut.remove(Users.JOHN_DOE.getId()));
         assertFalse(sut.remove(Users.JOHN_DOE.getId()));
     }
 
     @Test
-    void findsAllUsers() {
+    @Override
+    void findsAll() {
         sut.save(Users.JANE_DOE);
         var users = sut.findAll();
 
@@ -66,7 +70,21 @@ class UserRepositoryIT extends IntegrationTestBase {
     }
 
     @Test
-    void findsUserMatchingName() {
+    @Override
+    void findsById() {
+        sut.save(Users.JANE_DOE);
+
+        var user1 = sut.findById(Users.JOHN_DOE.getId());
+        var user2 = sut.findById(Users.JANE_DOE.getId());
+
+        assertAll(
+          () -> user1.ifPresentOrElse(u -> assertEquals(Users.JOHN_DOE, u), () -> fail("No value present")),
+          () -> user2.ifPresentOrElse(u -> assertEquals(Users.JANE_DOE, u), () -> fail("No value present"))
+        );
+    }
+
+    @Test
+    void findsByName() {
         sut.save(Users.JANE_DOE);
 
         var user1 = sut.findByName(Users.JOHN_DOE.getName());

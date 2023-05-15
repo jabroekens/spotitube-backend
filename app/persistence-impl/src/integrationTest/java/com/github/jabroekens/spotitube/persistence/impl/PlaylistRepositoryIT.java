@@ -31,7 +31,8 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	}
 
 	@Test
-	void insertsNewPlaylistSuccesfullyAndSetsId() {
+	@Override
+	void savesSuccesfully() {
 		var savedPlaylist = sut.save(Playlists.VIDEOS);
 		assertAll(
 		  () -> assertNotEquals("0", savedPlaylist.getId()),
@@ -44,7 +45,7 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	}
 
 	@Test
-	void throwsExceptionWhenInsertingPlaylistWithNonexistentInformation() {
+	void throwsExceptionWhenInsertingWithNonexistentInformation() {
 		var nonexistentTrack = Tracks.DEAR_NIA;
 		var playlist = new Playlist(Playlists.VIDEOS);
 		playlist.addTrack(nonexistentTrack);
@@ -53,7 +54,8 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	}
 
 	@Test
-	void updatesPlaylistIfExists() {
+	@Override
+	void updatesIfExists() {
 		var playlist = new Playlist(Playlists.EMPTY);
 		playlist.addTrack(Tracks.AMERICAN_LOVE);
 		playlist.setName("Songs");
@@ -67,19 +69,22 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	}
 
 	@Test
-	void removesPlaylistIfExists() {
+	@Override
+	void removesIfExists() {
 		assertTrue(sut.remove(Playlists.FAVORITES.getId()));
 		assertFalse(sut.remove(Playlists.FAVORITES.getId()));
 	}
 
 	@Test
-	void findsAllPlaylists() {
+	@Override
+	void findsAll() {
 		var playlists = sut.findAll();
 		assertEquals(Set.of(Playlists.EMPTY, Playlists.FAVORITES), playlists);
 	}
 
 	@Test
-	void findsPlaylistById() {
+	@Override
+	void findsById() {
 		var playlist = sut.findById(Playlists.FAVORITES.getId());
 		playlist.ifPresentOrElse(p -> assertEquals(Playlists.FAVORITES, p), () -> fail("No value present"));
 	}

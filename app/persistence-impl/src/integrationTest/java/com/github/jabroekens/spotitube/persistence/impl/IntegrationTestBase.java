@@ -23,4 +23,17 @@ abstract class IntegrationTestBase {
         return ds;
     }
 
+    // Required tests
+    // See also: https://github.com/junit-team/junit5/issues/960
+
+    abstract void savesSuccesfully();
+
+    abstract void updatesIfExists();
+
+    abstract void removesIfExists();
+
+    abstract void findsAll();
+
+    abstract void findsById();
+
 }
