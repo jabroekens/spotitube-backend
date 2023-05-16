@@ -1,6 +1,7 @@
-package com.github.jabroekens.spotitube.model.track.playlist;
+package com.github.jabroekens.spotitube.service.api.track.playlist;
 
 import com.github.jabroekens.spotitube.model.NotNullAndValid;
+import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 

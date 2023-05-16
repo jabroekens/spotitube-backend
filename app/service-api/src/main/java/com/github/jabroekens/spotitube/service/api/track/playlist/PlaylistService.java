@@ -3,7 +3,6 @@ package com.github.jabroekens.spotitube.service.api.track.playlist;
 import com.github.jabroekens.spotitube.model.NotNullAndValid;
 import com.github.jabroekens.spotitube.model.track.Track;
 import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
-import com.github.jabroekens.spotitube.model.track.playlist.PlaylistCollection;
 import com.github.jabroekens.spotitube.service.api.EntityExistsException;
 import com.github.jabroekens.spotitube.service.api.EntityNotFoundException;
 import java.util.List;

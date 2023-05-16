@@ -2,7 +2,7 @@ package com.github.jabroekens.spotitube.service.impl.track.playlist;
 
 import com.github.jabroekens.spotitube.model.track.Track;
 import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
-import com.github.jabroekens.spotitube.model.track.playlist.PlaylistCollection;
+import com.github.jabroekens.spotitube.service.api.track.playlist.PlaylistCollection;
 import com.github.jabroekens.spotitube.persistence.api.PlaylistRepository;
 import com.github.jabroekens.spotitube.persistence.api.TrackRepository;
 import com.github.jabroekens.spotitube.service.api.EntityExistsException;
