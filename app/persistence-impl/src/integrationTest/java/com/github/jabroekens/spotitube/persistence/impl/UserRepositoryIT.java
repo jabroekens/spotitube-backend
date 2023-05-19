@@ -2,10 +2,13 @@ package com.github.jabroekens.spotitube.persistence.impl;
 
 import com.github.jabroekens.spotitube.model.Performers;
 import com.github.jabroekens.spotitube.model.Users;
+import com.github.jabroekens.spotitube.model.user.User;
 import com.github.jabroekens.spotitube.persistence.api.UserRepository;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +20,7 @@ class UserRepositoryIT extends IntegrationTestBase {
 
     private UserRepository sut;
 
-    // Users.JOHN_DOE is inserted by `create_tables.sql`
+    // `Users.JohnDoe()` is inserted by `create_tables.sql`
     @BeforeEach
     void setUp() {
         var repository = new JdbcUserRepository();
@@ -29,7 +32,7 @@ class UserRepositoryIT extends IntegrationTestBase {
     @Override
     void addsSuccesfully() {
         var savedUser = sut.add(Users.JaneDoe());
-        assertEquals(Users.JaneDoe(), savedUser);
+        assertUser(Users.JaneDoe(), savedUser);
     }
 
     @Test
@@ -40,12 +43,7 @@ class UserRepositoryIT extends IntegrationTestBase {
         var savedUser = sut.findById(Users.JohnDoe().getId());
 
         savedUser.ifPresentOrElse(
-          (u) -> assertAll(
-            // The `equals()` implementation only looks at the business key, so we
-            // must assert the name separately: https://stackoverflow.com/a/1638886
-            () -> assertEquals(Users.JohnSmith(), u),
-            () -> assertEquals(Users.JohnSmith().getName(), u.getName())
-          ),
+          (u) -> assertUser(Users.JohnSmith(), u),
           () -> fail("No value present")
         );
     }
@@ -93,6 +91,20 @@ class UserRepositoryIT extends IntegrationTestBase {
         assertAll(
           () -> user1.ifPresentOrElse(u -> assertEquals(Users.JohnDoe(), u), () -> fail("No value present")),
           () -> user2.ifPresentOrElse(u -> assertEquals(Users.JaneDoe(), u), () -> fail("No value present"))
+        );
+    }
+
+    private static void assertUser(User expected, User actual, Executable... additionalAssertions) {
+        // The `equals()` implementation only looks at the business key, so we
+        // must assert all other fields separately: https://stackoverflow.com/a/1638886
+        assertAll(
+          Stream.concat(
+            Stream.of(additionalAssertions),
+            Stream.of(
+              () -> assertEquals(expected.getPasswordHash(), actual.getPasswordHash()),
+              () -> assertEquals(expected.getName(), actual.getName())
+            )
+          )
         );
     }
 

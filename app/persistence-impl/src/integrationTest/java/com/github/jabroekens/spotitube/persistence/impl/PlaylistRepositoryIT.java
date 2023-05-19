@@ -2,10 +2,13 @@ package com.github.jabroekens.spotitube.persistence.impl;
 
 import com.github.jabroekens.spotitube.model.Playlists;
 import com.github.jabroekens.spotitube.model.Tracks;
+import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
 import com.github.jabroekens.spotitube.persistence.api.PlaylistRepository;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,7 +22,7 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 
 	private PlaylistRepository sut;
 
-	// Playlists.EMPTY and Playlists.FAVORITE (and related information) are inserted by `create_tables.sql`
+	// `Playlists.Empty()` and `Playlists.Favorite()` (and related information) are inserted by `create_tables.sql`
 	@BeforeEach
 	void setUp() {
 		var repository = new JdbcPlaylistRepository();
@@ -31,13 +34,9 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	@Override
 	void addsSuccesfully() {
 		var savedPlaylist = sut.add(Playlists.Videos());
-		assertAll(
-		  () -> assertTrue(savedPlaylist.getId().isPresent()),
-		  // The `equals()` implementation only looks at the business key, so we
-		  // must assert all other fields separately: https://stackoverflow.com/a/1638886
-		  () -> assertEquals(Playlists.Videos().getName(), savedPlaylist.getName()),
-		  () -> assertEquals(Playlists.Videos().getOwner(), savedPlaylist.getOwner()),
-		  () -> assertIterableEquals(Playlists.Videos().getTracks(), savedPlaylist.getTracks())
+		assertPlaylist(
+		  Playlists.Videos(), savedPlaylist,
+		  () -> assertTrue(savedPlaylist.getId().isPresent())
 		);
 	}
 
@@ -49,11 +48,7 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 		playlist.setName("Songs");
 
 		var savedPlaylist = sut.merge(playlist);
-		assertAll(
-		  () -> assertEquals(playlist.getId(), savedPlaylist.getId()),
-		  () -> assertEquals(playlist.getName(), savedPlaylist.getName()),
-		  () -> assertIterableEquals(playlist.getTracks(), savedPlaylist.getTracks())
-		);
+		assertPlaylist(playlist, savedPlaylist);
 	}
 
 	@Test
@@ -75,6 +70,21 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	void findsById() {
 		var playlist = sut.findById(Playlists.Favorites().getId().get());
 		playlist.ifPresentOrElse(p -> assertEquals(Playlists.Favorites(), p), () -> fail("No value present"));
+	}
+
+	private static void assertPlaylist(Playlist expected, Playlist actual, Executable... additionalAssertions) {
+		// The `equals()` implementation only looks at the business key, so we
+		// must assert all other fields separately: https://stackoverflow.com/a/1638886
+		assertAll(
+		  Stream.concat(
+			Stream.of(additionalAssertions),
+			Stream.of(
+			  () -> assertEquals(expected.getName(), actual.getName()),
+			  () -> assertEquals(expected.getOwner(), actual.getOwner()),
+			  () -> assertIterableEquals(expected.getTracks(), actual.getTracks())
+			)
+		  )
+		);
 	}
 
 }
