@@ -47,7 +47,7 @@ public class User {
         return passwordHash;
     }
 
-    public void setPasswordHash(@NotBlank String passwordHash) {
+    public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
 
@@ -56,7 +56,7 @@ public class User {
         return name;
     }
 
-    public void setName(@NotBlank String name) {
+    public void setName(String name) {
         this.name = name;
     }
 

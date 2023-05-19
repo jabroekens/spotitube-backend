@@ -54,7 +54,7 @@ public class Playlist {
 		return Optional.ofNullable(id);
 	}
 
-	public void setId(@GeneratedId int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -63,7 +63,7 @@ public class Playlist {
 		return name;
 	}
 
-	public void setName(@NotBlank String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 
@@ -83,7 +83,7 @@ public class Playlist {
 	 * @param track the track to be added.
 	 * @return {@code true} if the track was added, {@code false} otherwise.
 	 */
-	public boolean addTrack(@NotNullAndValid Track track) {
+	public boolean addTrack(Track track) {
 		return tracks.add(track);
 	}
 

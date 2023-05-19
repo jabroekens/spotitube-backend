@@ -7,7 +7,6 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
-import java.security.KeyStoreException;
 import java.util.Optional;
 
 @Secured
@@ -28,8 +27,8 @@ public class AuthFilter implements ContainerRequestFilter {
 		}
 
 		try {
-			JwtUtil.validateToken(token.get());
-		} catch (JwtException | KeyStoreException e) {
+			JwtHelper.validateToken(token.get());
+		} catch (JwtException e) {
 			abortWithUnauthorized(requestContext);
 		}
 	}
@@ -44,7 +43,7 @@ public class AuthFilter implements ContainerRequestFilter {
 	}
 
 	private Optional<String> extractTokenFromQueryParams(ContainerRequestContext requestContext) {
-		return Optional.of(requestContext.getUriInfo().getQueryParameters().getFirst(TOKEN_PARAM));
+		return Optional.ofNullable(requestContext.getUriInfo().getQueryParameters().getFirst(TOKEN_PARAM));
 	}
 
 	private void abortWithUnauthorized(ContainerRequestContext requestContext) {

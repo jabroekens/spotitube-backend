@@ -6,13 +6,11 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.security.KeyPair;
-import java.security.KeyStoreException;
-import java.sql.Date;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
-public final class JwtUtil {
+public final class JwtHelper {
 
 	private static final String ISSUER = "Spotitube";
 	private static final String AUDIENCE = "Spotitube";
@@ -20,10 +18,14 @@ public final class JwtUtil {
 
 	private static final KeyPair JWT_KEY_PAIR = Keys.keyPairFor(SignatureAlgorithm.ES512);
 
+	private JwtHelper() {
+		throw new UnsupportedOperationException("Cannot instantiate util class");
+	}
+
 	public static String issueToken(User user) {
 		var currentTime = Instant.now();
-		var currentDate = Date.from(currentTime);
-		var expirationDate = Date.from(currentTime.plus(TOKEN_DURATION));
+		var currentDate = java.util.Date.from(currentTime);
+		var expirationDate = java.util.Date.from(currentTime.plus(TOKEN_DURATION));
 
 		return Jwts.builder()
 		  .setIssuer(ISSUER)
@@ -37,7 +39,7 @@ public final class JwtUtil {
 		  .compact();
 	}
 
-	public static void validateToken(String token) throws JwtException, KeyStoreException {
+	public static void validateToken(String token) throws JwtException {
 		Jwts.parserBuilder()
 		  .setSigningKey(JWT_KEY_PAIR.getPublic())
 		  .build()

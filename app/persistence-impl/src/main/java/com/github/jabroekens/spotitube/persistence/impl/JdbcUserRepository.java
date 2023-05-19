@@ -17,17 +17,17 @@ import static com.github.jabroekens.spotitube.persistence.impl.JdbcHelper.withPa
 public class JdbcUserRepository implements UserRepository {
 
     private static final String FIND_ALL_USERS = """
-	  SELECT id AS User_id, passwordHash AS User_passwordHash, name AS User_name
-	  FROM "User"
-	  """;
+      SELECT id AS User_id, passwordHash AS User_passwordHash, name AS User_name
+      FROM "User"
+      """;
 
     private static final String INSERT_USER = """
-	  INSERT INTO "User" (id, passwordHash, name) VALUES (?, ?, ?)
-	  """;
+      INSERT INTO "User" (id, passwordHash, name) VALUES (?, ?, ?)
+      """;
 
     private static final String UPDATE_USER = """
-	  UPDATE "User" SET passwordHash=?, name=? WHERE id=?
-	  """;
+      UPDATE "User" SET passwordHash=?, name=? WHERE id=?
+      """;
 
     private DataSource dataSource;
 
@@ -56,13 +56,10 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(String userId) throws PersistenceException {
+    public Optional<User> findById(String id) throws PersistenceException {
         try (
           var conn = dataSource.getConnection();
-          var stmt = withParams(
-            conn.prepareStatement(FIND_ALL_USERS + " WHERE id=?"),
-            userId
-          );
+          var stmt = withParams(conn.prepareStatement(FIND_ALL_USERS + " WHERE id=?"), id);
           var results = stmt.executeQuery()
         ) {
             return Optional.ofNullable(results.next() ? JdbcHelper.toEntity(User.class, results) : null);

@@ -1,7 +1,9 @@
 package com.github.jabroekens.spotitube.service.api.user;
 
 import com.github.jabroekens.spotitube.model.user.User;
+import com.github.jabroekens.spotitube.model.user.UserId;
 import com.github.jabroekens.spotitube.service.api.EntityNotFoundException;
+import jakarta.validation.constraints.NotBlank;
 
 public interface UserService {
 
@@ -15,6 +17,6 @@ public interface UserService {
 	 * @throws IncorrectPasswordException when the given password {@code password} is incorrect for the user with ID
 	 *                                    {@code userId}.
 	 */
-	User getUser(String userId, String password) throws EntityNotFoundException, IncorrectPasswordException;
+	User getUser(@UserId String userId, @NotBlank String password) throws EntityNotFoundException, IncorrectPasswordException;
 
 }

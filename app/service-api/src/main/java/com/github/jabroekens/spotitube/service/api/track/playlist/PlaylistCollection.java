@@ -1,8 +1,6 @@
 package com.github.jabroekens.spotitube.service.api.track.playlist;
 
-import com.github.jabroekens.spotitube.model.NotNullAndValid;
 import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
-import jakarta.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 /**
@@ -12,8 +10,8 @@ import java.util.Collection;
  * @param playlists the playlists.
  */
 public record PlaylistCollection(
-	@PositiveOrZero int length,
-	Collection<@NotNullAndValid Playlist> playlists
+	int length,
+	Collection<Playlist> playlists
 ) {
 
 }

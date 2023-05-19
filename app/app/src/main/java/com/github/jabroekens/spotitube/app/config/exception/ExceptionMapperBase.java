@@ -7,6 +7,14 @@ public abstract class ExceptionMapperBase<T extends Throwable> implements Except
 
 	protected abstract Response.Status getStatus();
 
+	/**
+	 * Decorates the response to be built for {@link T}.
+	 *
+	 * @param t               the throwable for which the response will be built.
+	 * @param responseBuilder the response builder to be decorated.
+	 *
+	 * @return {@code responseBuilder}.
+	 */
 	protected Response.ResponseBuilder decorate(T t, Response.ResponseBuilder responseBuilder) {
 		return responseBuilder;
 	}

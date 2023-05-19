@@ -1,6 +1,8 @@
 package com.github.jabroekens.spotitube.persistence.impl;
 
 import com.github.jabroekens.spotitube.model.Entity;
+import com.github.jabroekens.spotitube.persistence.api.PersistenceException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -46,14 +48,7 @@ public final class JdbcHelper {
                 var fieldType = field.getType();
                 field.setAccessible(true);
 
-                Object value = null;
-
-                try {
-                    var columnName = resultType.getSimpleName() + "_" + field.getName();
-                    value = resultSet.getObject(columnName, wrapIfPrimitive(fieldType));
-                } catch (SQLException ignored) {
-                }
-
+                var value = getValueForField(resultType, resultSet, field);
                 if (value != null) {
                     field.set(result, value);
                 } else if (fieldType.getAnnotation(Entity.class) != null) {
@@ -61,6 +56,7 @@ public final class JdbcHelper {
                     field.set(result, toEntity(fieldType, resultSet));
                 }
             }
+
             return result;
         } catch (
           InstantiationException
@@ -68,7 +64,17 @@ public final class JdbcHelper {
           | InvocationTargetException
           | NoSuchMethodException e
         ) {
-            throw new RuntimeException(e);
+            throw new PersistenceException(e);
+        }
+    }
+
+    private static <T> Object getValueForField(Class<T> resultType, ResultSet resultSet, Field field) {
+        try {
+            var fieldType = field.getType();
+            var columnName = resultType.getSimpleName() + "_" + field.getName();
+            return resultSet.getObject(columnName, wrapIfPrimitive(fieldType));
+        } catch (SQLException ignored) {
+            return null;
         }
     }
 

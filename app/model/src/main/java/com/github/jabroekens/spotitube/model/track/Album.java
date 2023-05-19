@@ -35,7 +35,7 @@ public class Album {
 		return name;
 	}
 
-	public void setName(@NotBlank String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 

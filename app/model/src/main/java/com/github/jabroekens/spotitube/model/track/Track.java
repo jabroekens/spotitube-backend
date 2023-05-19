@@ -3,7 +3,6 @@ package com.github.jabroekens.spotitube.model.track;
 import com.github.jabroekens.spotitube.model.Entity;
 import com.github.jabroekens.spotitube.model.NotNullAndValid;
 import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -17,14 +16,17 @@ import java.util.Optional;
 @Entity
 public class Track {
 
+	// Common
 	private Integer id;
 	private String title;
 	private Performer performer;
 	private int duration;
 	private boolean offlineAvailable;
 
+	// Song
 	private Album album;
 
+	// Video
 	private int playCount;
 	private ZonedDateTime publicationDate;
 	private String description;
@@ -119,7 +121,7 @@ public class Track {
 		return Optional.ofNullable(id);
 	}
 
-	public void setId(@GeneratedId int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -141,7 +143,7 @@ public class Track {
 		return duration;
 	}
 
-	@Valid
+	@NotNullAndValid
 	public Album getAlbum() {
 		return album;
 	}
@@ -155,7 +157,7 @@ public class Track {
 		return Optional.ofNullable(publicationDate);
 	}
 
-	public Optional<String> getDescription() {
+	public Optional<@NotBlank String> getDescription() {
 		return Optional.ofNullable(description);
 	}
 
