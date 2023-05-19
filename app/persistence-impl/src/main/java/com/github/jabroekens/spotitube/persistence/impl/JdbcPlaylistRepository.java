@@ -10,7 +10,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import javax.sql.DataSource;
@@ -66,7 +66,7 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 
 	@Override
 	public Collection<Playlist> findAll() throws PersistenceException {
-		var playlists = new LinkedHashSet<Playlist>();
+		var playlists = new LinkedHashMap<Integer, Playlist>();
 
 		try (
 		  var conn = dataSource.getConnection();
@@ -74,7 +74,10 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 		) {
 			try (var results = stmt.executeQuery(FIND_ALL_PLAYLISTS)) {
 				while (results.next()) {
-					playlists.add(JdbcHelper.toEntity(Playlist.class, results));
+					var playlist = JdbcHelper.toEntity(Playlist.class, results);
+					// We may assume playlists that have been persisted have an ID
+					// noinspection OptionalGetWithoutIsPresent
+					playlists.put(playlist.getId().get(), playlist);
 				}
 			}
 
@@ -82,17 +85,14 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 				while (results.next()) {
 					var track = JdbcHelper.toEntity(Track.class, results);
 					var playlistId = results.getInt("PlaylistTrack_playlist");
-
-					playlists.stream()
-					  .filter(p -> p.getId().equals(Optional.of(playlistId)))
-					  .forEach(p -> p.addTrack(track));
+					playlists.get(playlistId).addTrack(track);
 				}
 			}
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 
-		return playlists;
+		return playlists.values();
 	}
 
 	@Override

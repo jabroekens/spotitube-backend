@@ -62,7 +62,7 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	@Override
 	void findsAll() {
 		var playlists = sut.findAll();
-		assertEquals(Set.of(Playlists.Empty(), Playlists.Favorites()), playlists);
+		assertIterableEquals(Set.of(Playlists.Empty(), Playlists.Favorites()), playlists);
 	}
 
 	@Test
