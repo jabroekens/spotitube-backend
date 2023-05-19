@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 
 public final class JdbcHelper {
 
@@ -16,7 +17,14 @@ public final class JdbcHelper {
 
     public static PreparedStatement withParams(PreparedStatement stmt, Object... params) throws SQLException {
         for (int i = 0; i < params.length; i++) {
-            stmt.setObject(i + 1, params[i]);
+            var obj = params[i];
+
+            // JDBC 4.2 does not require ZonedDateTime support (see: https://stackoverflow.com/a/51370336)
+            if (obj instanceof ZonedDateTime zdt) {
+                stmt.setObject(i + 1, zdt.toOffsetDateTime());
+            } else {
+                stmt.setObject(i + 1, obj);
+            }
         }
         return stmt;
     }

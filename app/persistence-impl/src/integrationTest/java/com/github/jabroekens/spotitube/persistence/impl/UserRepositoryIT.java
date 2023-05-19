@@ -64,7 +64,7 @@ class UserRepositoryIT extends IntegrationTestBase {
         var users = sut.findAll();
 
         assertEquals(
-          Set.of(Users.JohnDoe(), Performers.Smallpools(), Performers.Kurzgesagt(), Users.JaneDoe()),
+          Set.of(Users.JohnDoe(), Performers.Smallpools(), Performers.Kurzgesagt(), Performers.Exurb1a(), Users.JaneDoe()),
           users
         );
     }

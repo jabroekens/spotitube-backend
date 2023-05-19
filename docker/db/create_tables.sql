@@ -52,18 +52,23 @@ VALUES ('john',
         'Smallpools'),
        ('kurzgesagt',
         '$argon2id$v=19$m=16,t=2,p=1$cDFiT1NWNHR6WkNZdUxrcA$NWwrXvOqes96osF+j5il9ahsDhJvnhnzyRhVQUuifJk',
-        'Kurzgesagt - In a Nutshell');
+        'Kurzgesagt - In a Nutshell'),
+       ('exurb1a',
+        '$argon2id$v=19$m=16,t=2,p=1$cDFiT1NWNHR6WkNZdUxrcA$NWwrXvOqes96osF+j5il9ahsDhJvnhnzyRhVQUuifJk',
+        'Exurb1a');
 
 INSERT INTO Performer (id)
 VALUES ('smallpools'),
-       ('kurzgesagt');
+       ('kurzgesagt'),
+       ('exurb1a');
 
 INSERT INTO Album (name)
 VALUES ('Lovetap!');
 
 INSERT INTO Track (title, performer, duration, offlineAvailable, album, playCount, publicationDate, description)
 VALUES ('American Love', 'smallpools', 179, true, 'Lovetap!', null, null, null),
-       ('The Egg - A Short Story', 'kurzgesagt', 474, false, null, 28613533, '2019-09-01', 'The Egg. Story by Andy Weir, Animated by Kurzgesagt');
+       ('The Egg - A Short Story', 'kurzgesagt', 474, false, null, 28613533, '2019-09-01',
+        'The Egg. Story by Andy Weir, Animated by Kurzgesagt');
 
 INSERT INTO Playlist (name, owner)
 VALUES ('Empty', 'john'),
