@@ -120,6 +120,7 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 		}
 
 		try (var conn = dataSource.getConnection()) {
+			conn.setAutoCommit(false);
 			var result = new Playlist(playlist);
 
 			try (
@@ -146,10 +147,13 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 					  )
 					) {
 						trackStmt.executeUpdate();
+						conn.commit();
 					}
 
 					result.setId(playlistId);
 				}
+			} catch (SQLException e) {
+				conn.rollback();
 			}
 
 			return result;
@@ -165,6 +169,7 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 		}
 
 		try (var conn = dataSource.getConnection()) {
+			conn.setAutoCommit(false);
 			var playlistId = playlist.getId().get();
 			var result = new Playlist(playlist);
 
@@ -194,6 +199,8 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 					deleteTracksStmt.executeUpdate();
 					trackStmt.executeUpdate();
 				}
+			} catch (SQLException e) {
+				conn.rollback();
 			}
 
 			return result;
