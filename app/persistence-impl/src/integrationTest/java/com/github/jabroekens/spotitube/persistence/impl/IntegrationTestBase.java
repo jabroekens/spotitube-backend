@@ -26,9 +26,9 @@ abstract class IntegrationTestBase {
     // Required tests
     // See also: https://github.com/junit-team/junit5/issues/960
 
-    abstract void savesSuccesfully();
+    abstract void addsSuccesfully();
 
-    abstract void updatesIfExists();
+    abstract void mergesSuccesfully();
 
     abstract void removesIfExists();
 

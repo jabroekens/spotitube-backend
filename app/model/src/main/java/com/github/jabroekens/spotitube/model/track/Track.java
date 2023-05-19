@@ -17,7 +17,7 @@ import java.util.Optional;
 @Entity
 public class Track {
 
-	private int id;
+	private Integer id;
 	private String title;
 	private Performer performer;
 	private int duration;
@@ -39,7 +39,6 @@ public class Track {
 	/**
 	 * Creates a track for a song.
 	 *
-	 * @param id               the ID of the track.
 	 * @param title            the title of the song.
 	 * @param performer        the performer of the song.
 	 * @param duration         the duration of the song in seconds.
@@ -47,20 +46,18 @@ public class Track {
 	 * @param offlineAvailable if the track is available for offline use.
 	 */
 	public Track(
-		int id,
 		String title,
 		Performer performer,
 		int duration,
 		Album album,
 		boolean offlineAvailable
 	) {
-		this(id, title, performer, duration, 0, album, null, null, offlineAvailable);
+		this(title, performer, duration, 0, album, null, null, offlineAvailable);
 	}
 
 	/**
 	 * Creates a track for a video.
 	 *
-	 * @param id               the ID of the track.
 	 * @param title            the title of the video.
 	 * @param performer        the publisher of the video.
 	 * @param duration         the duration of the video in seconds.
@@ -70,7 +67,6 @@ public class Track {
 	 * @param offlineAvailable if the track is available for offline use.
 	 */
 	public Track(
-	  int id,
 	  String title,
 	  Performer performer,
 	  int duration,
@@ -79,7 +75,7 @@ public class Track {
 	  String description,
 	  boolean offlineAvailable
 	) {
-		this(id, title, performer, duration, playCount, null, publicationDate, description, offlineAvailable);
+		this(title, performer, duration, playCount, null, publicationDate, description, offlineAvailable);
 	}
 
 	/**
@@ -100,7 +96,6 @@ public class Track {
 	}
 
 	private Track(
-	  int id,
 	  String title,
 	  Performer performer,
 	  int duration,
@@ -110,7 +105,6 @@ public class Track {
 	  String description,
 	  boolean offlineAvailable
 	) {
-		this.id = id;
 		this.title = title;
 		this.performer = performer;
 		this.duration = duration;
@@ -121,9 +115,12 @@ public class Track {
 		this.offlineAvailable = offlineAvailable;
 	}
 
-	@Id
-	public String getId() {
-		return String.valueOf(id);
+	public Optional<@GeneratedId Integer> getId() {
+		return Optional.ofNullable(id);
+	}
+
+	public void setId(@GeneratedId int id) {
+		this.id = id;
 	}
 
 	@NotBlank

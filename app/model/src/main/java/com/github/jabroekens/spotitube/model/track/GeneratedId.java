@@ -4,7 +4,7 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.ReportAsSingleViolation;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -18,15 +18,15 @@ import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @NotNull
-@Pattern(regexp = "0[1-9]*[0-9]*")
+@Positive
 @Constraint(validatedBy = {})
 @ReportAsSingleViolation
 @Documented
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
-public @interface Id {
+public @interface GeneratedId {
 
-    String message() default "must be a whole number";
+    String message() default "must be a positive number";
 
     Class<?>[] groups() default {};
 

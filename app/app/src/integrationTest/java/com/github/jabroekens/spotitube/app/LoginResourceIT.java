@@ -21,7 +21,7 @@ class LoginResourceIT extends IntegrationTestBase {
     @Test
     void returnsErrorForUnknownUser() throws IOException, InterruptedException {
         var response = httpClient.post("/login", "{\"user\":\"unknown\",\"password\":\"password\"}");
-        assertResponse(404, "{\"error\":\"Entity of type 'User' with ID 'unknown' has not been found.\"}", response);
+        assertResponse(404, "{\"error\":\"Entity of type 'User' with details 'id=unknown' has not been found.\"}", response);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.github.jabroekens.spotitube.service.api.track.playlist;
 
 import com.github.jabroekens.spotitube.model.NotNullAndValid;
+import com.github.jabroekens.spotitube.model.track.GeneratedId;
 import com.github.jabroekens.spotitube.model.track.Track;
 import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
 import com.github.jabroekens.spotitube.service.api.EntityExistsException;
@@ -39,7 +40,7 @@ public interface PlaylistService {
 	 *
 	 * @throws EntityNotFoundException when no playlist has been found with ID {@code playlistId}.
 	 */
-	PlaylistCollection removePlaylist(@NotNullAndValid String playlistId) throws EntityNotFoundException;
+	PlaylistCollection removePlaylist(@GeneratedId int playlistId) throws EntityNotFoundException;
 
 	/**
 	 * {@return the complete list of tracks for the playlist matching the specified ID}
@@ -48,7 +49,7 @@ public interface PlaylistService {
 	 *
 	 * @throws EntityNotFoundException when no playlist has been found with ID {@code playlistId}.
 	 */
-	List<Track> getPlaylistTracks(@NotNullAndValid String playlistId) throws EntityNotFoundException;
+	List<Track> getPlaylistTracks(@GeneratedId int playlistId) throws EntityNotFoundException;
 
 	/**
 	 * {@return the complete list of tracks for the playlist matching the specified ID}
@@ -58,7 +59,7 @@ public interface PlaylistService {
 	 *
 	 * @throws EntityNotFoundException when no playlist or track has been found with the given ID(s).
 	 */
-	List<Track> addTrackToPlaylist(@NotNullAndValid String playlistId, String trackId) throws EntityNotFoundException;
+	List<Track> addTrackToPlaylist(@GeneratedId int playlistId, @GeneratedId int trackId) throws EntityNotFoundException;
 
 	/**
 	 * {@return the complete list of tracks for the playlist matching the specified ID}
@@ -68,7 +69,7 @@ public interface PlaylistService {
 	 *
 	 * @throws EntityNotFoundException when no playlist or track has been found with the given ID(s).
 	 */
-	List<Track> removeTrackFromPlaylist(@NotNullAndValid String playlistId, @NotNullAndValid String trackId)
+	List<Track> removeTrackFromPlaylist(@GeneratedId int playlistId, @GeneratedId int trackId)
 	  throws EntityNotFoundException;
 
 }

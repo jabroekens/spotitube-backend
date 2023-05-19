@@ -1,6 +1,6 @@
 package com.github.jabroekens.spotitube.service.api.track;
 
-import com.github.jabroekens.spotitube.model.NotNullAndValid;
+import com.github.jabroekens.spotitube.model.track.GeneratedId;
 import com.github.jabroekens.spotitube.model.track.Track;
 import com.github.jabroekens.spotitube.service.api.EntityNotFoundException;
 import java.util.List;
@@ -16,6 +16,6 @@ public interface TrackService {
 	 *
 	 * @throws EntityNotFoundException when no playlist has been found with ID {@code playlistId}.
 	 */
-	List<Track> getAvailableTracks(@NotNullAndValid String playlistId) throws EntityNotFoundException;
+	List<Track> getAvailableTracks(@GeneratedId int playlistId) throws EntityNotFoundException;
 
 }

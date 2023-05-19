@@ -37,17 +37,10 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 	  INNER JOIN "User" u on p.id = u.id
 	  """;
 
-	private static final String SAVE_PLAYLIST = """
-	  INSERT INTO Playlist (name, owner)
-	  VALUES (?, ?)
-	  ON CONFLICT (id) DO UPDATE SET name=?, owner=?
-	  RETURNING id
-	  """;
-
-	private static final String SAVE_PLAYLIST_TRACK = """
-	  INSERT INTO PlaylistTrack (playlist, track)
-	  VALUES (?, ?)
-	  """;
+	private static final String INSERT_PLAYLIST = "INSERT INTO Playlist (name, owner) VALUES (?, ?)";
+	private static final String INSERT_PLAYLIST_TRACKS = "INSERT INTO PlaylistTrack (playlist, track) VALUES (?, ?)";
+	private static final String UPDATE_PLAYLIST = "UPDATE Playlist SET name=?, owner=? WHERE id=?";
+	private static final String DELETE_PLAYLIST_TRACKS = "DELETE FROM PlaylistTrack WHERE playlist=?";
 
 	private DataSource dataSource;
 
@@ -57,7 +50,7 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 	}
 
 	@Override
-	public Collection<Playlist> findAll() {
+	public Collection<Playlist> findAll() throws PersistenceException {
 		try (
 		  var conn = dataSource.getConnection();
 		  var stmt = conn.createStatement()
@@ -73,8 +66,11 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 			try (var results = stmt.executeQuery(FIND_ALL_PLAYLIST_TRACKS)) {
 				while (results.next()) {
 					var value = JdbcHelper.toEntity(Track.class, results);
-					var playlistId = results.getString("PlaylistTrack_playlist");
-					playlists.stream().filter(p -> p.getId().equals(playlistId)).forEach(p -> p.addTrack(value));
+					var playlistId = results.getInt("PlaylistTrack_playlist");
+
+					playlists.stream()
+					  .filter(p -> p.getId().equals(Optional.of(playlistId)))
+					  .forEach(p -> p.addTrack(value));
 				}
 			}
 
@@ -85,13 +81,12 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 	}
 
 	@Override
-	public Optional<Playlist> findById(String playlistId) {
+	public Optional<Playlist> findById(Integer playlistId) throws PersistenceException {
 		try (var conn = dataSource.getConnection()) {
-			var intPlaylistId = Integer.parseInt(playlistId);
 			Playlist playlist = null;
 
 			try (
-			  var stmt = withParams(conn.prepareStatement(FIND_ALL_PLAYLISTS + " WHERE p.id = ?"), intPlaylistId);
+			  var stmt = withParams(conn.prepareStatement(FIND_ALL_PLAYLISTS + " WHERE p.id = ?"), playlistId);
 			  var results = stmt.executeQuery()
 			) {
 				if (results.next()) {
@@ -100,7 +95,7 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 					try (
 					  var trackStmt = withParams(
 						conn.prepareStatement(FIND_ALL_PLAYLIST_TRACKS + " WHERE pt.playlist = ?"),
-						intPlaylistId
+						playlistId
 					  );
 					  var trackResults = trackStmt.executeQuery()
 					) {
@@ -119,14 +114,17 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 	}
 
 	@Override
-	public Playlist save(Playlist playlist) {
+	public Playlist add(Playlist playlist) throws PersistenceException {
+		if (playlist.getId().isPresent()) {
+			throw new PersistenceException();
+		}
+
 		try (var conn = dataSource.getConnection()) {
 			var result = new Playlist(playlist);
 
 			try (
 			  var playlistStmt = withParams(
-				conn.prepareStatement(SAVE_PLAYLIST, Statement.RETURN_GENERATED_KEYS),
-				playlist.getName(), playlist.getOwner().getId(),
+				conn.prepareStatement(INSERT_PLAYLIST, Statement.RETURN_GENERATED_KEYS),
 				playlist.getName(), playlist.getOwner().getId()
 			  )
 			) {
@@ -136,11 +134,14 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 				if (keys.next()) {
 					var playlistId = keys.getInt("id");
 
+					// We may assume tracks added to a playlist have
+					// been persisted already (and thus have an ID)
+					// noinspection OptionalGetWithoutIsPresent
 					try (
 					  var trackStmt = withBatchParams(
-						conn.prepareStatement(SAVE_PLAYLIST_TRACK),
+						conn.prepareStatement(INSERT_PLAYLIST_TRACKS),
 						playlist.getTracks().stream()
-						  .map(t -> new Object[]{playlistId, Integer.parseInt(t.getId())})
+						  .map(t -> new Object[]{playlistId, t.getId().get()})
 						  .toArray(Object[][]::new)
 					  )
 					) {
@@ -158,10 +159,54 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 	}
 
 	@Override
-	public boolean remove(String id) {
+	public Playlist merge(Playlist playlist) throws PersistenceException {
+		if (playlist.getId().isEmpty()) {
+			throw new PersistenceException();
+		}
+
+		try (var conn = dataSource.getConnection()) {
+			var playlistId = playlist.getId().get();
+			var result = new Playlist(playlist);
+
+			try (
+			  var playlistStmt = withParams(
+				conn.prepareStatement(UPDATE_PLAYLIST),
+				playlist.getName(), playlist.getOwner().getId(), playlistId
+			  )
+			) {
+				playlistStmt.executeUpdate();
+
+				// We may assume tracks added to a playlist have
+				// been persisted already (and thus have an ID)
+				// noinspection OptionalGetWithoutIsPresent
+				try (
+				  var deleteTracksStmt = withParams(
+					conn.prepareStatement(DELETE_PLAYLIST_TRACKS),
+					playlist.getId().get()
+				  );
+				  var trackStmt = withBatchParams(
+					conn.prepareStatement(INSERT_PLAYLIST_TRACKS),
+					playlist.getTracks().stream()
+					  .map(t -> new Object[]{playlistId, t.getId().get()})
+					  .toArray(Object[][]::new)
+				  )
+				) {
+					deleteTracksStmt.executeUpdate();
+					trackStmt.executeUpdate();
+				}
+			}
+
+			return result;
+		} catch (SQLException e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	@Override
+	public boolean remove(Integer id) throws PersistenceException {
 		try (
 		  var conn = dataSource.getConnection();
-		  var stmt = withParams(conn.prepareStatement("DELETE FROM Playlist WHERE id=?"), Integer.parseInt(id))
+		  var stmt = withParams(conn.prepareStatement("DELETE FROM Playlist WHERE id=?"), id)
 		) {
 			return stmt.executeUpdate() > 0;
 		} catch (SQLException e) {

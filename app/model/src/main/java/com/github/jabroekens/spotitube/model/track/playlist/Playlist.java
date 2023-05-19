@@ -2,7 +2,7 @@ package com.github.jabroekens.spotitube.model.track.playlist;
 
 import com.github.jabroekens.spotitube.model.Entity;
 import com.github.jabroekens.spotitube.model.NotNullAndValid;
-import com.github.jabroekens.spotitube.model.track.Id;
+import com.github.jabroekens.spotitube.model.track.GeneratedId;
 import com.github.jabroekens.spotitube.model.track.Track;
 import com.github.jabroekens.spotitube.model.user.User;
 import jakarta.validation.constraints.NotBlank;
@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 @Entity
 public class Playlist {
 
-	private int id;
+	private Integer id;
 	private String name;
 	private User owner;
 	private final List<Track> tracks;
@@ -31,8 +32,7 @@ public class Playlist {
 		this.tracks = new LinkedList<>();
 	}
 
-	public Playlist(int id, String name, User owner, List<Track> tracks) {
-		this.id = id;
+	public Playlist(String name, User owner, List<Track> tracks) {
 		this.name = name;
 		this.owner = owner;
 		this.tracks = new LinkedList<>(tracks);
@@ -50,12 +50,11 @@ public class Playlist {
 		  .collect(Collectors.toCollection(LinkedList::new));
 	}
 
-	@Id
-	public String getId() {
-		return String.valueOf(id);
+	public Optional<@GeneratedId Integer> getId() {
+		return Optional.ofNullable(id);
 	}
 
-	public void setId(@Id int id) {
+	public void setId(@GeneratedId int id) {
 		this.id = id;
 	}
 
@@ -95,8 +94,8 @@ public class Playlist {
 	 *
 	 * @return {@code true} if the track was removed, {@code false} false otherwise.
 	 */
-	public boolean removeTrack(String trackId) {
-		return tracks.removeIf(t -> t.getId().equals(trackId));
+	public boolean removeTrack(int trackId) {
+		return tracks.removeIf(t -> t.getId().equals(Optional.of(trackId)));
 	}
 
 	@Override

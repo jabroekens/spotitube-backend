@@ -7,14 +7,14 @@ public class EntityExistsException extends IllegalStateException {
 	private final Class<?> entityType;
 	private final String entityId;
 
-	public EntityExistsException(Class<?> entityType, String entityId) {
+	public EntityExistsException(Class<?> entityType, Object entityId) {
 		this(entityType, entityId, null);
 	}
 
-	public EntityExistsException(Class<?> entityType, String entityId, Throwable cause) {
-		super(ERROR_MSG.formatted(entityType.getSimpleName(), entityId));
+	public EntityExistsException(Class<?> entityType, Object entityId, Throwable cause) {
+		super(ERROR_MSG.formatted(entityType.getSimpleName(), entityId), cause);
 		this.entityType = entityType;
-		this.entityId = entityId;
+		this.entityId = entityId.toString();
 	}
 
 	public Class<?> getEntityType() {

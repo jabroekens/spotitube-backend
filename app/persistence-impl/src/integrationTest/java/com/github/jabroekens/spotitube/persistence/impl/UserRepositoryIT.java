@@ -27,15 +27,15 @@ class UserRepositoryIT extends IntegrationTestBase {
 
     @Test
     @Override
-    void savesSuccesfully() {
-        var savedUser = sut.save(Users.JaneDoe());
+    void addsSuccesfully() {
+        var savedUser = sut.add(Users.JaneDoe());
         assertEquals(Users.JaneDoe(), savedUser);
     }
 
     @Test
     @Override
-    void updatesIfExists() {
-        sut.save(Users.JohnSmith());
+    void mergesSuccesfully() {
+        sut.merge(Users.JohnSmith());
 
         var savedUser = sut.findById(Users.JohnDoe().getId());
 
@@ -60,7 +60,7 @@ class UserRepositoryIT extends IntegrationTestBase {
     @Test
     @Override
     void findsAll() {
-        sut.save(Users.JaneDoe());
+        sut.add(Users.JaneDoe());
         var users = sut.findAll();
 
         assertEquals(
@@ -72,7 +72,7 @@ class UserRepositoryIT extends IntegrationTestBase {
     @Test
     @Override
     void findsById() {
-        sut.save(Users.JaneDoe());
+        sut.add(Users.JaneDoe());
 
         var user1 = sut.findById(Users.JohnDoe().getId());
         var user2 = sut.findById(Users.JaneDoe().getId());
@@ -85,7 +85,7 @@ class UserRepositoryIT extends IntegrationTestBase {
 
     @Test
     void findsByName() {
-        sut.save(Users.JaneDoe());
+        sut.add(Users.JaneDoe());
 
         var user1 = sut.findByName(Users.JohnDoe().getName());
         var user2 = sut.findByName(Users.JaneDoe().getName());

@@ -2,7 +2,6 @@ package com.github.jabroekens.spotitube.persistence.impl;
 
 import com.github.jabroekens.spotitube.model.Playlists;
 import com.github.jabroekens.spotitube.model.Tracks;
-import com.github.jabroekens.spotitube.persistence.api.PersistenceException;
 import com.github.jabroekens.spotitube.persistence.api.PlaylistRepository;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,11 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 class PlaylistRepositoryIT extends IntegrationTestBase {
 
 	private PlaylistRepository sut;
@@ -31,10 +29,10 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 
 	@Test
 	@Override
-	void savesSuccesfully() {
-		var savedPlaylist = sut.save(Playlists.Videos());
+	void addsSuccesfully() {
+		var savedPlaylist = sut.add(Playlists.Videos());
 		assertAll(
-		  () -> assertNotEquals("0", savedPlaylist.getId()),
+		  () -> assertTrue(savedPlaylist.getId().isPresent()),
 		  // The `equals()` implementation only looks at the business key, so we
 		  // must assert all other fields separately: https://stackoverflow.com/a/1638886
 		  () -> assertEquals(Playlists.Videos().getName(), savedPlaylist.getName()),
@@ -44,22 +42,13 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	}
 
 	@Test
-	void throwsExceptionWhenInsertingWithNonexistentInformation() {
-		var nonexistentTrack = Tracks.DearNia();
-		var playlist = Playlists.Videos();
-		playlist.addTrack(nonexistentTrack);
-
-		assertThrows(PersistenceException.class, () -> sut.save(playlist));
-	}
-
-	@Test
 	@Override
-	void updatesIfExists() {
+	void mergesSuccesfully() {
 		var playlist = Playlists.Empty();
 		playlist.addTrack(Tracks.AmericanLove());
 		playlist.setName("Songs");
 
-		var savedPlaylist = sut.save(playlist);
+		var savedPlaylist = sut.merge(playlist);
 		assertAll(
 		  () -> assertEquals(playlist.getId(), savedPlaylist.getId()),
 		  () -> assertEquals(playlist.getName(), savedPlaylist.getName()),
@@ -70,8 +59,8 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	@Test
 	@Override
 	void removesIfExists() {
-		assertTrue(sut.remove(Playlists.Favorites().getId()));
-		assertFalse(sut.remove(Playlists.Favorites().getId()));
+		assertTrue(sut.remove(Playlists.Favorites().getId().get()));
+		assertFalse(sut.remove(Playlists.Favorites().getId().get()));
 	}
 
 	@Test
@@ -84,7 +73,7 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	@Test
 	@Override
 	void findsById() {
-		var playlist = sut.findById(Playlists.Favorites().getId());
+		var playlist = sut.findById(Playlists.Favorites().getId().get());
 		playlist.ifPresentOrElse(p -> assertEquals(Playlists.Favorites(), p), () -> fail("No value present"));
 	}
 

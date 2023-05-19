@@ -21,7 +21,7 @@ public class DefaultUserService implements UserService {
 
     @Override
     public User getUser(String userId, String password) throws EntityNotFoundException, IncorrectPasswordException {
-        var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, userId));
+        var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id=%s".formatted(userId)));
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new IncorrectPasswordException(user.getId());
         } else {

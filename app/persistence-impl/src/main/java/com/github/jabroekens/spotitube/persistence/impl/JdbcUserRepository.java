@@ -21,10 +21,12 @@ public class JdbcUserRepository implements UserRepository {
 	  FROM "User"
 	  """;
 
-    private static final String SAVE_USER = """
-	  INSERT INTO "User" (id, passwordHash, name)
-	  VALUES (?, ?, ?)
-	  ON CONFLICT (id) DO UPDATE SET passwordHash=?, name=?
+    private static final String INSERT_USER = """
+	  INSERT INTO "User" (id, passwordHash, name) VALUES (?, ?, ?)
+	  """;
+
+    private static final String UPDATE_USER = """
+	  UPDATE "User" SET passwordHash=?, name=? WHERE id=?
 	  """;
 
     private DataSource dataSource;
@@ -35,7 +37,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public Collection<User> findAll() {
+    public Collection<User> findAll() throws PersistenceException {
         var users = new LinkedHashSet<User>();
 
         try (
@@ -54,7 +56,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(String userId) {
+    public Optional<User> findById(String userId) throws PersistenceException {
         try (
           var conn = dataSource.getConnection();
           var stmt = withParams(
@@ -70,7 +72,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByName(String name) {
+    public Optional<User> findByName(String name) throws PersistenceException {
         try (
           var conn = dataSource.getConnection();
           var stmt = withParams(
@@ -86,13 +88,28 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public User save(User user) {
+    public User add(User user) throws PersistenceException {
         try (
           var conn = dataSource.getConnection();
           var stmt = withParams(
-            conn.prepareStatement(SAVE_USER),
-            user.getId(), user.getPasswordHash(), user.getName(),
-            user.getPasswordHash(), user.getName()
+            conn.prepareStatement(INSERT_USER),
+            user.getId(), user.getPasswordHash(), user.getName()
+          )
+        ) {
+            stmt.executeUpdate();
+            return new User(user);
+        } catch (SQLException e) {
+            throw new PersistenceException(e);
+        }
+    }
+
+    @Override
+    public User merge(User user) throws PersistenceException {
+        try (
+          var conn = dataSource.getConnection();
+          var stmt = withParams(
+            conn.prepareStatement(UPDATE_USER),
+            user.getPasswordHash(), user.getName(), user.getId()
           )
         ) {
             stmt.executeUpdate();
