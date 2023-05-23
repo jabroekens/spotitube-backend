@@ -8,7 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Optional;
 import javax.sql.DataSource;
 
@@ -27,9 +27,9 @@ public class JdbcTrackRepository implements TrackRepository {
       t.publicationDate  AS Track_publicationDate,
       t.description      AS Track_description,
       a.name             AS Album_name,
-      u.id               AS User_id,
-      u.passwordHash     AS User_passwordHash,
-      u.name             AS User_name
+      u.id               AS Performer_id,
+      u.passwordHash     AS Performer_passwordHash,
+      u.name             AS Performer_name
       FROM Track t
       LEFT JOIN Album a on t.album = a.name
       INNER JOIN Performer p on t.performer = p.id
@@ -58,7 +58,7 @@ public class JdbcTrackRepository implements TrackRepository {
 
 	@Override
 	public Collection<Track> findAll() throws PersistenceException {
-		var tracks = new LinkedHashSet<Track>();
+		var tracks = new LinkedList<Track>();
 
 		try (
 		  var conn = dataSource.getConnection();

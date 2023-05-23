@@ -2,17 +2,17 @@ package com.github.jabroekens.spotitube.persistence.impl;
 
 import com.github.jabroekens.spotitube.model.Performers;
 import com.github.jabroekens.spotitube.model.Users;
-import com.github.jabroekens.spotitube.model.user.User;
 import com.github.jabroekens.spotitube.persistence.api.UserRepository;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -32,18 +32,23 @@ class UserRepositoryIT extends IntegrationTestBase {
     @Override
     void addsSuccesfully() {
         var savedUser = sut.add(Users.JaneDoe());
-        assertUser(Users.JaneDoe(), savedUser);
+        assertEquals(Users.JaneDoe(), savedUser);
     }
 
     @Test
     @Override
     void mergesSuccesfully() {
-        sut.merge(Users.JohnSmith());
+        var user = Users.JohnDoe();
+        user.setName("John Smith");
 
-        var savedUser = sut.findById(Users.JohnDoe().getId());
+        var mergedUser = sut.merge(user);
+        var savedUser = sut.findById(user.getId());
 
         savedUser.ifPresentOrElse(
-          (u) -> assertUser(Users.JohnSmith(), u),
+          (u) -> {
+              assertEquals(user, mergedUser);
+              assertEquals(mergedUser, u);
+          },
           () -> fail("No value present")
         );
     }
@@ -58,26 +63,29 @@ class UserRepositoryIT extends IntegrationTestBase {
     @Test
     @Override
     void findsAll() {
-        sut.add(Users.JaneDoe());
-        var users = sut.findAll();
+        var expectedUsers = Stream.of(
+          Users.JohnDoe(), Performers.Smallpools(),
+          Performers.Kurzgesagt(), Performers.Exurb1a()
+        ).collect(Collectors.toCollection(ArrayList::new));
 
-        assertEquals(
-          Set.of(Users.JohnDoe(), Performers.Smallpools(), Performers.Kurzgesagt(), Performers.Exurb1a(), Users.JaneDoe()),
-          users
-        );
+        assertIterableEquals(expectedUsers, sut.findAll());
+
+        expectedUsers.add(sut.add(Users.JaneDoe()));
+        assertIterableEquals(expectedUsers, sut.findAll());
     }
 
     @Test
     @Override
     void findsById() {
-        sut.add(Users.JaneDoe());
+        var existingUser = Users.JohnDoe();
+        var addedUser = sut.add(Users.JaneDoe());
 
-        var user1 = sut.findById(Users.JohnDoe().getId());
-        var user2 = sut.findById(Users.JaneDoe().getId());
+        var user1 = sut.findById(existingUser.getId());
+        var user2 = sut.findById(addedUser.getId());
 
         assertAll(
-          () -> user1.ifPresentOrElse(u -> assertEquals(Users.JohnDoe(), u), () -> fail("No value present")),
-          () -> user2.ifPresentOrElse(u -> assertEquals(Users.JaneDoe(), u), () -> fail("No value present"))
+          () -> user1.ifPresentOrElse(u -> assertEquals(existingUser, u), () -> fail("No value present")),
+          () -> user2.ifPresentOrElse(u -> assertEquals(addedUser, u), () -> fail("No value present"))
         );
     }
 
@@ -91,20 +99,6 @@ class UserRepositoryIT extends IntegrationTestBase {
         assertAll(
           () -> user1.ifPresentOrElse(u -> assertEquals(Users.JohnDoe(), u), () -> fail("No value present")),
           () -> user2.ifPresentOrElse(u -> assertEquals(Users.JaneDoe(), u), () -> fail("No value present"))
-        );
-    }
-
-    private static void assertUser(User expected, User actual, Executable... additionalAssertions) {
-        // The `equals()` implementation only looks at the business key, so we
-        // must assert all other fields separately: https://stackoverflow.com/a/1638886
-        assertAll(
-          Stream.concat(
-            Stream.of(additionalAssertions),
-            Stream.of(
-              () -> assertEquals(expected.getPasswordHash(), actual.getPasswordHash()),
-              () -> assertEquals(expected.getName(), actual.getName())
-            )
-          )
         );
     }
 

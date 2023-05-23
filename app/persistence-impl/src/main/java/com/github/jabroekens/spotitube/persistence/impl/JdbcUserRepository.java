@@ -7,7 +7,7 @@ import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Optional;
 import javax.sql.DataSource;
 
@@ -38,7 +38,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Collection<User> findAll() throws PersistenceException {
-        var users = new LinkedHashSet<User>();
+        var users = new LinkedList<User>();
 
         try (
           var conn = dataSource.getConnection();

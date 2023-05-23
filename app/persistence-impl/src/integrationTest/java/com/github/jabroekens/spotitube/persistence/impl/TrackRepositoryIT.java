@@ -1,13 +1,12 @@
 package com.github.jabroekens.spotitube.persistence.impl;
 
 import com.github.jabroekens.spotitube.model.Tracks;
-import com.github.jabroekens.spotitube.model.track.Track;
 import com.github.jabroekens.spotitube.persistence.api.TrackRepository;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,10 +34,9 @@ class TrackRepositoryIT extends IntegrationTestBase {
 		var track = Tracks.DearNia();
 		var savedTrack = sut.add(track);
 
-		assertTrack(
-		  track, savedTrack,
-		  () -> assertTrue(savedTrack.getId().isPresent())
-		);
+		assertTrue(savedTrack.getId().isPresent());
+		track.setId(savedTrack.getId().get());
+		assertEquals(track, savedTrack);
 	}
 
 	@Test
@@ -57,34 +55,28 @@ class TrackRepositoryIT extends IntegrationTestBase {
 	@Test
 	@Override
 	void findsAll() {
-		var tracks = sut.findAll();
-		assertIterableEquals(Set.of(Tracks.AmericanLove(), Tracks.TheEgg()), tracks);
+		var expectedTracks = Stream.of(
+		 Tracks.AmericanLove(), Tracks.TheEgg()
+		).collect(Collectors.toCollection(ArrayList::new));
+
+		assertIterableEquals(expectedTracks, sut.findAll());
+
+		expectedTracks.add(sut.add(Tracks.DearNia()));
+		assertIterableEquals(expectedTracks, sut.findAll());
 	}
 
 	@Test
 	@Override
 	void findsById() {
-		var track = sut.findById(Tracks.AmericanLove().getId().get());
-		track.ifPresentOrElse(p -> assertEquals(Tracks.AmericanLove(), p), () -> fail("No value present"));
-	}
+		var existingTrack = Tracks.AmericanLove();
+		var addedTrack = sut.add(Tracks.DearNia());
 
-	private static void assertTrack(Track expected, Track actual, Executable... additionalAssertions) {
-		// The `equals()` implementation only looks at the business key, so we
-		// must assert all other fields separately: https://stackoverflow.com/a/1638886
+		var track1 = sut.findById(existingTrack.getId().get());
+		var track2 = sut.findById(addedTrack.getId().get());
+
 		assertAll(
-		  Stream.concat(
-			Stream.of(additionalAssertions),
-			Stream.of(
-			  () -> assertEquals(expected.getTitle(), actual.getTitle()),
-			  () -> assertEquals(expected.getPerformer(), actual.getPerformer()),
-			  () -> assertEquals(expected.getDuration(), actual.getDuration()),
-			  () -> assertEquals(expected.isOfflineAvailable(), actual.isOfflineAvailable()),
-			  () -> assertEquals(expected.getAlbum(), actual.getAlbum()),
-			  () -> assertEquals(expected.getPlayCount(), actual.getPlayCount()),
-			  () -> assertEquals(expected.getPublicationDate(), actual.getPublicationDate()),
-			  () -> assertEquals(expected.getDescription(), actual.getDescription())
-			)
-		  )
+		  () -> track1.ifPresentOrElse(u -> assertEquals(existingTrack, u), () -> fail("No value present")),
+		  () -> track2.ifPresentOrElse(u -> assertEquals(addedTrack, u), () -> fail("No value present"))
 		);
 	}
 

@@ -42,9 +42,9 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
       t.publicationDate  AS Track_publicationDate,
       t.description      AS Track_description,
       a.name             AS Album_name,
-      u.id               AS User_id,
-      u.passwordHash     AS User_passwordHash,
-      u.name             AS User_name
+      u.id               AS Performer_id,
+      u.passwordHash     AS Performer_passwordHash,
+      u.name             AS Performer_name
       FROM PlaylistTrack pt
       INNER JOIN Track t ON pt.track = t.id
       LEFT JOIN Album a on t.album = a.name
@@ -149,7 +149,12 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 			if (keys.next()) {
 				var playlistId = keys.getInt("id");
 				result.setId(playlistId);
-				insertTracks(playlist.getTracks(), conn, playlistId);
+
+				if (!playlist.getTracks().isEmpty()) {
+					insertTracks(playlist.getTracks(), conn, playlistId);
+				}
+
+				conn.commit();
 			}
 		} catch (SQLException e) {
 			conn.rollback();
@@ -170,8 +175,7 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 			  .toArray(Object[][]::new)
 		  )
 		) {
-			trackStmt.executeUpdate();
-			conn.commit();
+			trackStmt.executeBatch();
 		}
 	}
 
@@ -198,6 +202,7 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 		) {
 			playlistStmt.executeUpdate();
 			reinsertTracks(playlist.getTracks(), conn, playlistId);
+			conn.commit();
 		} catch (SQLException e) {
 			conn.rollback();
 		}
@@ -206,23 +211,17 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 	}
 
 	private static void reinsertTracks(List<Track> tracks, Connection conn, int playlistId) throws SQLException {
-		// We may assume tracks added to a playlist have
-		// been persisted already (and thus have an ID)
-		// noinspection OptionalGetWithoutIsPresent
 		try (
 		  var deleteTracksStmt = withParams(
 			conn.prepareStatement(DELETE_PLAYLIST_TRACKS),
 			playlistId
-		  );
-		  var insertTracksStmt = withBatchParams(
-			conn.prepareStatement(INSERT_PLAYLIST_TRACKS),
-			tracks.stream()
-			  .map(t -> new Object[]{playlistId, t.getId().get()})
-			  .toArray(Object[][]::new)
 		  )
 		) {
 			deleteTracksStmt.executeUpdate();
-			insertTracksStmt.executeUpdate();
+
+			if (!tracks.isEmpty()) {
+				insertTracks(tracks, conn, playlistId);
+			}
 		}
 	}
 

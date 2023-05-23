@@ -7,7 +7,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 public final class JdbcHelper {
 
@@ -18,25 +22,15 @@ public final class JdbcHelper {
     public static PreparedStatement withParams(PreparedStatement stmt, Object... params) throws SQLException {
         for (int i = 0; i < params.length; i++) {
             var obj = params[i];
-
-            // JDBC 4.2 does not require ZonedDateTime support (see: https://stackoverflow.com/a/51370336)
-            if (obj instanceof ZonedDateTime zdt) {
-                stmt.setObject(i + 1, zdt.toOffsetDateTime());
-            } else {
-                stmt.setObject(i + 1, obj);
-            }
+            stmt.setObject(i + 1, obj);
         }
         return stmt;
     }
 
     public static PreparedStatement withBatchParams(PreparedStatement stmt, Object[][] batchParams)
       throws SQLException {
-        for (int i = 0; i < batchParams.length; i++) {
-            var params = batchParams[i];
-
-            for (int j = 0; j < params.length; j++) {
-                stmt.setObject((i * 2) + j + 1, params[j]);
-            }
+        for (var params : batchParams) {
+            withParams(stmt, params);
             stmt.addBatch();
         }
         return stmt;
@@ -48,24 +42,22 @@ public final class JdbcHelper {
      */
     public static <T> T toEntity(Class<T> resultType, ResultSet resultSet) {
         try {
-            var constructor = resultType.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            var result = constructor.newInstance();
+            var fieldsToSet = new HashMap<Field, Object>();
 
-            for (var field : resultType.getDeclaredFields()) {
+            for (var field : getAllFields(resultType)) {
                 var fieldType = field.getType();
                 field.setAccessible(true);
 
                 var value = getValueForField(resultType, resultSet, field);
                 if (value != null) {
-                    field.set(result, value);
+                    fieldsToSet.put(field, value);
                 } else if (fieldType.getAnnotation(Entity.class) != null) {
                     // XXX ^ might break when field is array/interface/record etc.
-                    field.set(result, toEntity(fieldType, resultSet));
+                    fieldsToSet.put(field, toEntity(fieldType, resultSet));
                 }
             }
 
-            return result;
+            return constructEntity(resultType, fieldsToSet);
         } catch (
           InstantiationException
           | IllegalAccessException
@@ -74,6 +66,36 @@ public final class JdbcHelper {
         ) {
             throw new PersistenceException(e);
         }
+    }
+
+    private static <T> T constructEntity(Class<T> resultType, HashMap<Field, Object> fieldsToSet)
+      throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        if (fieldsToSet.values().stream().anyMatch(Objects::nonNull)) {
+            var constructor = resultType.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            var result = constructor.newInstance();
+
+            for (var entry : fieldsToSet.entrySet()) {
+                var field = entry.getKey();
+                var value = entry.getValue();
+                field.set(result, value);
+            }
+
+            return result;
+        }
+
+        return null;
+    }
+
+    private static List<Field> getAllFields(Class<?> resultType) {
+        var fields = new ArrayList<Field>();
+        Collections.addAll(fields, resultType.getDeclaredFields());
+
+        if (resultType.getSuperclass() != null) {
+            fields.addAll(getAllFields(resultType.getSuperclass()));
+        }
+
+        return fields;
     }
 
     private static <T> Object getValueForField(Class<T> resultType, ResultSet resultSet, Field field) {

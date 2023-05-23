@@ -2,13 +2,12 @@ package com.github.jabroekens.spotitube.persistence.impl;
 
 import com.github.jabroekens.spotitube.model.Playlists;
 import com.github.jabroekens.spotitube.model.Tracks;
-import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
 import com.github.jabroekens.spotitube.persistence.api.PlaylistRepository;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,11 +32,12 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	@Test
 	@Override
 	void addsSuccesfully() {
-		var savedPlaylist = sut.add(Playlists.Videos());
-		assertPlaylist(
-		  Playlists.Videos(), savedPlaylist,
-		  () -> assertTrue(savedPlaylist.getId().isPresent())
-		);
+		var playlist = Playlists.Videos();
+		var savedPlaylist = sut.add(playlist);
+
+		assertTrue(savedPlaylist.getId().isPresent());
+		playlist.setId(savedPlaylist.getId().get());
+		assertEquals(playlist, savedPlaylist);
 	}
 
 	@Test
@@ -47,8 +47,16 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 		playlist.addTrack(Tracks.AmericanLove());
 		playlist.setName("Songs");
 
-		var savedPlaylist = sut.merge(playlist);
-		assertPlaylist(playlist, savedPlaylist);
+		var mergedPlaylist = sut.merge(playlist);
+		var savedPlaylist = sut.findById(playlist.getId().get());
+
+		savedPlaylist.ifPresentOrElse(
+		  (p) -> {
+			  assertEquals(playlist, mergedPlaylist);
+			  assertEquals(mergedPlaylist, p);
+		  },
+		  () -> fail("No value present")
+		);
 	}
 
 	@Test
@@ -61,29 +69,28 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 	@Test
 	@Override
 	void findsAll() {
-		var playlists = sut.findAll();
-		assertIterableEquals(Set.of(Playlists.Empty(), Playlists.Favorites()), playlists);
+		var expectedPlaylists = Stream.of(
+		  Playlists.Empty(), Playlists.Favorites()
+		).collect(Collectors.toCollection(ArrayList::new));
+
+		assertIterableEquals(expectedPlaylists, sut.findAll());
+
+		expectedPlaylists.add(sut.add(Playlists.Videos()));
+		assertIterableEquals(expectedPlaylists, sut.findAll());
 	}
 
 	@Test
 	@Override
 	void findsById() {
-		var playlist = sut.findById(Playlists.Favorites().getId().get());
-		playlist.ifPresentOrElse(p -> assertEquals(Playlists.Favorites(), p), () -> fail("No value present"));
-	}
+		var existingPlaylist = Playlists.Favorites();
+		var addedPlaylist = sut.add(Playlists.Videos());
 
-	private static void assertPlaylist(Playlist expected, Playlist actual, Executable... additionalAssertions) {
-		// The `equals()` implementation only looks at the business key, so we
-		// must assert all other fields separately: https://stackoverflow.com/a/1638886
+		var playlist1 = sut.findById(existingPlaylist.getId().get());
+		var playlist2 = sut.findById(addedPlaylist.getId().get());
+
 		assertAll(
-		  Stream.concat(
-			Stream.of(additionalAssertions),
-			Stream.of(
-			  () -> assertEquals(expected.getName(), actual.getName()),
-			  () -> assertEquals(expected.getOwner(), actual.getOwner()),
-			  () -> assertIterableEquals(expected.getTracks(), actual.getTracks())
-			)
-		  )
+		  () -> playlist1.ifPresentOrElse(u -> assertEquals(existingPlaylist, u), () -> fail("No value present")),
+		  () -> playlist2.ifPresentOrElse(u -> assertEquals(addedPlaylist, u), () -> fail("No value present"))
 		);
 	}
 
