@@ -32,9 +32,7 @@ public class User {
      * Returns a deep copy of {@code user}.
      */
     public User(User user) {
-        this.id = user.id;
-        this.passwordHash = user.passwordHash;
-        this.name = user.name;
+        this(user.id, user.passwordHash, user.name);
     }
 
     @UserId
@@ -64,11 +62,14 @@ public class User {
     public final boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof User user)) return false;
-        return Objects.equals(getId(), user.getId());
+        return Objects.equals(getId(), user.getId())
+               && Objects.equals(getPasswordHash(), user.getPasswordHash())
+               && Objects.equals(getName(), user.getName());
     }
 
     @Override
     public final int hashCode() {
         return Objects.hash(getId());
     }
+
 }

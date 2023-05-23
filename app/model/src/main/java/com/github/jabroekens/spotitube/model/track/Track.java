@@ -6,7 +6,7 @@ import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,7 +28,7 @@ public class Track {
 
 	// Video
 	private int playCount;
-	private ZonedDateTime publicationDate;
+	private LocalDate publicationDate;
 	private String description;
 
 	/**
@@ -44,17 +44,17 @@ public class Track {
 	 * @param title            the title of the song.
 	 * @param performer        the performer of the song.
 	 * @param duration         the duration of the song in seconds.
-	 * @param album            the album the song is a part of.
 	 * @param offlineAvailable if the track is available for offline use.
+	 * @param album            the album the song is a part of.
 	 */
 	public Track(
 		String title,
 		Performer performer,
 		int duration,
-		Album album,
-		boolean offlineAvailable
+		boolean offlineAvailable,
+		Album album
 	) {
-		this(title, performer, duration, 0, album, null, null, offlineAvailable);
+		this(title, performer, duration, offlineAvailable, album, 0, null, null);
 	}
 
 	/**
@@ -63,58 +63,58 @@ public class Track {
 	 * @param title            the title of the video.
 	 * @param performer        the publisher of the video.
 	 * @param duration         the duration of the video in seconds.
+	 * @param offlineAvailable if the track is available for offline use.
 	 * @param playCount        the amount of times the video has been played.
 	 * @param publicationDate  the publication date of the video. May be {@code null}.
 	 * @param description      the description of the video. May be {@code null}.
-	 * @param offlineAvailable if the track is available for offline use.
 	 */
 	public Track(
 	  String title,
 	  Performer performer,
 	  int duration,
+	  boolean offlineAvailable,
 	  int playCount,
-	  ZonedDateTime publicationDate,
-	  String description,
-	  boolean offlineAvailable
+	  LocalDate publicationDate,
+	  String description
 	) {
-		this(title, performer, duration, playCount, null, publicationDate, description, offlineAvailable);
+		this(title, performer, duration, offlineAvailable, null, playCount, publicationDate, description);
 	}
 
 	/**
 	 * Returns a deep copy of {@code track}.
 	 */
 	public Track(Track track) {
+		this(
+		  track.title,
+		  track.performer != null ? new Performer(track.performer) : null,
+		  track.duration,
+		  track.offlineAvailable,
+		  track.album != null ? new Album(track.album) : null,
+		  track.playCount,
+		  track.publicationDate,
+		  track.description
+		);
 		this.id = track.id;
-		this.title = track.title;
-		this.performer = new Performer(track.performer);
-		this.duration = track.duration;
-		this.offlineAvailable = track.offlineAvailable;
-
-		this.album = track.album != null ? new Album(track.album) : null;
-
-		this.playCount = track.playCount;
-		this.publicationDate = track.publicationDate;
-		this.description = track.description;
 	}
 
 	private Track(
 	  String title,
 	  Performer performer,
 	  int duration,
-	  int playCount,
+	  boolean offlineAvailable,
 	  Album album,
-	  ZonedDateTime publicationDate,
-	  String description,
-	  boolean offlineAvailable
+	  int playCount,
+	  LocalDate publicationDate,
+	  String description
 	) {
 		this.title = title;
 		this.performer = performer;
 		this.duration = duration;
+		this.offlineAvailable = offlineAvailable;
 		this.album = album;
 		this.playCount = playCount;
 		this.publicationDate = publicationDate;
 		this.description = description;
-		this.offlineAvailable = offlineAvailable;
 	}
 
 	public Optional<@GeneratedId Integer> getId() {
@@ -153,7 +153,11 @@ public class Track {
 		return playCount;
 	}
 
-	public Optional<ZonedDateTime> getPublicationDate() {
+	public void setPlayCount(int playCount) {
+		this.playCount = playCount;
+	}
+
+	public Optional<LocalDate> getPublicationDate() {
 		return Optional.ofNullable(publicationDate);
 	}
 
@@ -169,12 +173,27 @@ public class Track {
 	public final boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Track track)) return false;
-		return Objects.equals(getId(), track.getId());
+		return id != null
+			   && Objects.equals(getId(), track.getId())
+			   && getDuration() == track.getDuration()
+			   && isOfflineAvailable() == track.isOfflineAvailable()
+			   && getPlayCount() == track.getPlayCount()
+			   && Objects.equals(getTitle(), track.getTitle())
+			   && Objects.equals(getPerformer(), track.getPerformer())
+			   && Objects.equals(getAlbum(), track.getAlbum())
+			   && Objects.equals(getPublicationDate(), track.getPublicationDate())
+			   && Objects.equals(getDescription(), track.getDescription());
 	}
 
 	@Override
 	public final int hashCode() {
-		return Objects.hash(getId());
+		return Objects.hash(
+		  getDuration(),
+		  isOfflineAvailable(),
+		  getTitle(),
+		  getPublicationDate(),
+		  getDescription()
+		);
 	}
 
 }

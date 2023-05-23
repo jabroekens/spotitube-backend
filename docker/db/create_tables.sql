@@ -24,7 +24,7 @@ CREATE TABLE Track
     offlineAvailable BOOLEAN      NOT NULL,
     album            VARCHAR(255) REFERENCES Album (name) ON DELETE CASCADE ON UPDATE CASCADE,
     playCount        INT,
-    publicationDate  TIMESTAMP WITH TIME ZONE,
+    publicationDate  DATE,
     description      VARCHAR(1024)
 );
 
@@ -55,7 +55,7 @@ VALUES ('john',
         'Kurzgesagt - In a Nutshell'),
        ('exurb1a',
         '$argon2id$v=19$m=16,t=2,p=1$cDFiT1NWNHR6WkNZdUxrcA$NWwrXvOqes96osF+j5il9ahsDhJvnhnzyRhVQUuifJk',
-        'Exurb1a');
+        'exurb1a');
 
 INSERT INTO Performer (id)
 VALUES ('smallpools'),

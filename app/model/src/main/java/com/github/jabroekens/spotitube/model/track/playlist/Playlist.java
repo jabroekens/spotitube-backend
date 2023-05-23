@@ -42,12 +42,12 @@ public class Playlist {
 	 * Returns a deep copy of {@code playlist}.
 	 */
 	public Playlist(Playlist playlist) {
+		this(
+		  playlist.name,
+		  playlist.owner != null ? new User(playlist.owner) : null,
+		  playlist.tracks.stream().map(Track::new).collect(Collectors.toCollection(LinkedList::new))
+		);
 		this.id = playlist.id;
-		this.name = playlist.name;
-		this.owner = new User(playlist.owner);
-		this.tracks = playlist.getTracks().stream()
-		  .map(Track::new)
-		  .collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	public Optional<@GeneratedId Integer> getId() {
@@ -102,12 +102,16 @@ public class Playlist {
 	public final boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Playlist playlist)) return false;
-		return Objects.equals(getId(), playlist.getId());
+		return id != null
+			   && Objects.equals(getId(), playlist.getId())
+			   && Objects.equals(getName(), playlist.getName())
+			   && Objects.equals(getOwner(), playlist.getOwner())
+			   && Objects.equals(getTracks(), playlist.getTracks());
 	}
 
 	@Override
 	public final int hashCode() {
-		return Objects.hash(getId());
+		return 13;
 	}
 
 }
