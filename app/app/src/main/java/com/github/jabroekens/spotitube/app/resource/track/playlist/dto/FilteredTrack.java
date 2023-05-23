@@ -10,13 +10,29 @@ public class FilteredTrack {
 
   @JsonUnwrapped
   @JsonIgnoreProperties({"performer", "album", "publicationDate"})
-  public Track track;
+  private Track track;
 
-  public String performer;
+  private String performer;
 
-  public String album;
+  private String album;
 
-  public String publicationDate;
+  private String publicationDate;
+
+  public Track track() {
+    return track;
+  }
+
+  public String performer() {
+    return performer;
+  }
+
+  public String album() {
+    return album;
+  }
+
+  public String publicationDate() {
+    return publicationDate;
+  }
 
   public static FilteredTrack fromTrack(Track track) {
     var filteredTrack = new FilteredTrack();
@@ -27,9 +43,9 @@ public class FilteredTrack {
       filteredTrack.album = track.getAlbum().getName();
     }
 
-    if (track.getPublicationDate().isPresent()) {
-      filteredTrack.publicationDate = track.getPublicationDate().get().format(DateTimeFormatter.ofPattern("MM-dd-yyyy"));
-    }
+    track.getPublicationDate().ifPresent(
+      pd -> filteredTrack.publicationDate = pd.format(DateTimeFormatter.ofPattern("MM-dd-yyyy"))
+    );
 
     return filteredTrack;
   }

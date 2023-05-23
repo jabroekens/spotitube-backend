@@ -75,9 +75,7 @@ public class PlaylistResource {
     @POST
     @Path("{id}/tracks")
     public Response addPlaylistTrack(@PathParam("id") int playlistId, FilteredTrack filteredTrack) {
-        // Per API, we may assume there's an ID present
-        // noinspection OptionalGetWithoutIsPresent
-        playlistService.addTrackToPlaylist(playlistId, filteredTrack.track.getId().get());
+        playlistService.addTrackToPlaylist(playlistId, filteredTrack.track().getId().orElseThrow());
         return getPlaylistTracks(playlistId);
     }
 
@@ -95,22 +93,12 @@ public class PlaylistResource {
         // playlist-to-be-made's owner to be the authenticated user as
         // required by our domain model (a playlist must have an owner)
         return new PlaylistRequest(
-          filteredPlaylistRequest.playlistRequest.id(),
-          filteredPlaylistRequest.playlistRequest.name(),
+          filteredPlaylistRequest.playlistRequest().id(),
+          filteredPlaylistRequest.playlistRequest().name(),
           authenticatedUser,
-          Optional.ofNullable(filteredPlaylistRequest.tracks).orElse(List.of())
-            .stream().map(PlaylistResource::toTrack).toList()
+          Optional.ofNullable(filteredPlaylistRequest.tracks()).orElse(List.of())
+            .stream().map(ft -> new Track(ft.track())).toList()
         );
-    }
-
-    private static Track toTrack(FilteredTrack filteredTrack) {
-        // Only the ID is used when modifying a playlist
-        var track = new Track(null, null, 0, false, null);
-
-        // Per API, we may assume there's an ID present
-        // noinspection OptionalGetWithoutIsPresent
-        track.setId(filteredTrack.track.getId().get());
-        return track;
     }
 
 }

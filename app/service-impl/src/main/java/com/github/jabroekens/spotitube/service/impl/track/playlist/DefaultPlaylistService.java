@@ -14,6 +14,7 @@ import com.github.jabroekens.spotitube.service.api.track.playlist.PlaylistServic
 import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class DefaultPlaylistService implements PlaylistService {
 
@@ -40,12 +41,10 @@ public class DefaultPlaylistService implements PlaylistService {
 			try {
 				return playlistRepository.add(playlist);
 			} catch (PersistenceException e) {
-				// We may assume an ID is set (see `Repository#add(T)` Javadoc)
-				// noinspection OptionalGetWithoutIsPresent
-				throw new EntityExistsException(Playlist.class, playlist.getId().get().toString());
+				throw new EntityExistsException(Playlist.class, playlist.getId().orElseThrow());
 			}
 		} else {
-			throw new EntityNotFoundException(User.class, "id=%s".formatted(playlistRequest.owner()));
+			throw new EntityNotFoundException(User.class, Map.of("id", playlistRequest.owner()));
 		}
 	}
 
@@ -64,17 +63,17 @@ public class DefaultPlaylistService implements PlaylistService {
 			try {
 				return playlistRepository.merge(playlist);
 			} catch (PersistenceException e) {
-				throw new EntityNotFoundException(Playlist.class, "name=%s, owner=%s".formatted(playlist.getName(), playlist.getOwner().getId()));
+				throw new EntityNotFoundException(Playlist.class, Map.of("name", playlist.getName(), "owner", playlist.getOwner().getId()));
 			}
 		} else {
-			throw new EntityNotFoundException(User.class, "id=%s".formatted(playlistRequest.owner()));
+			throw new EntityNotFoundException(User.class, Map.of("id", playlistRequest.owner()));
 		}
 	}
 
 	@Override
 	public void removePlaylist(int playlistId) throws EntityNotFoundException {
 		if (!playlistRepository.remove(playlistId)) {
-			throw new EntityNotFoundException(Playlist.class, "id=%s".formatted(playlistId));
+			throw new EntityNotFoundException(Playlist.class, Map.of("id", playlistId));
 		}
 	}
 
@@ -82,7 +81,7 @@ public class DefaultPlaylistService implements PlaylistService {
 	public List<Track> getPlaylistTracks(int playlistId) throws EntityNotFoundException {
 		return playlistRepository
 		  .findById(playlistId)
-		  .orElseThrow(() -> new EntityNotFoundException(Playlist.class, "id=%s".formatted(playlistId)))
+		  .orElseThrow(() -> new EntityNotFoundException(Playlist.class, Map.of("id", playlistId)))
 		  .getTracks();
 	}
 
@@ -90,10 +89,10 @@ public class DefaultPlaylistService implements PlaylistService {
 	public List<Track> addTrackToPlaylist(int playlistId, int trackId) throws EntityNotFoundException {
 		var playlist = playlistRepository
 		  .findById(playlistId)
-		  .orElseThrow(() -> new EntityNotFoundException(Playlist.class, "id=%s".formatted(playlistId)));
+		  .orElseThrow(() -> new EntityNotFoundException(Playlist.class, Map.of("id", playlistId)));
 
 		var track = trackRepository.findById(trackId)
-		  .orElseThrow(() -> new EntityNotFoundException(Track.class, "id=%s".formatted(trackId)));
+		  .orElseThrow(() -> new EntityNotFoundException(Track.class, Map.of("id", trackId)));
 
 		playlist.addTrack(track);
 		return playlistRepository.merge(playlist).getTracks();
@@ -103,10 +102,10 @@ public class DefaultPlaylistService implements PlaylistService {
 	public List<Track> removeTrackFromPlaylist(int playlistId, int trackId) throws EntityNotFoundException {
 		var playlist = playlistRepository
 		  .findById(playlistId)
-		  .orElseThrow(() -> new EntityNotFoundException(Playlist.class, "id=%s".formatted(playlistId)));
+		  .orElseThrow(() -> new EntityNotFoundException(Playlist.class, Map.of("id", playlistId)));
 
 		if (!playlist.removeTrack(trackId)) {
-			throw new EntityNotFoundException(Track.class, "id=%s".formatted(trackId));
+			throw new EntityNotFoundException(Track.class, Map.of("id", trackId));
 		}
 
 		return playlistRepository.merge(playlist).getTracks();

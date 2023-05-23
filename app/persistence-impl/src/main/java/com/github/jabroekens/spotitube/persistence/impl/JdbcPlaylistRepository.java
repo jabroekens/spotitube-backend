@@ -75,9 +75,7 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 			try (var results = stmt.executeQuery(FIND_ALL_PLAYLISTS)) {
 				while (results.next()) {
 					var playlist = JdbcHelper.toEntity(Playlist.class, results);
-					// We may assume playlists that have been persisted have an ID
-					// noinspection OptionalGetWithoutIsPresent
-					playlists.put(playlist.getId().get(), playlist);
+					playlists.put(playlist.getId().orElseThrow(), playlist);
 				}
 			}
 
@@ -164,14 +162,11 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 	}
 
 	private static void insertTracks(List<Track> tracks, Connection conn, int playlistId) throws SQLException {
-		// We may assume tracks added to a playlist have
-		// been persisted already (and thus have an ID)
-		// noinspection OptionalGetWithoutIsPresent
 		try (
 		  var trackStmt = withBatchParams(
 			conn.prepareStatement(INSERT_PLAYLIST_TRACKS),
 			tracks.stream()
-			  .map(t -> new Object[]{playlistId, t.getId().get()})
+			  .map(t -> new Object[]{playlistId, t.getId().orElseThrow()})
 			  .toArray(Object[][]::new)
 		  )
 		) {
@@ -181,13 +176,14 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 
 	@Override
 	public Playlist merge(Playlist playlist) throws PersistenceException {
-		if (playlist.getId().isEmpty()) {
+		var playlistId = playlist.getId();
+		if (playlistId.isEmpty()) {
 			throw new PersistenceException();
 		}
 
 		try (var conn = dataSource.getConnection()) {
 			conn.setAutoCommit(false);
-			return mergePlaylist(playlist, conn, playlist.getId().get());
+			return mergePlaylist(playlist, conn, playlistId.get());
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}

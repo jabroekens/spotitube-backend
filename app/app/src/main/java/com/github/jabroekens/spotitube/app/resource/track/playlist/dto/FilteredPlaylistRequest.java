@@ -10,10 +10,22 @@ public class FilteredPlaylistRequest {
 
   @JsonUnwrapped
   @JsonIgnoreProperties({"owner", "tracks"})
-  public PlaylistRequest playlistRequest;
+  private PlaylistRequest playlistRequest;
 
-  public boolean owner;
+  private boolean owner;
 
-  public List<FilteredTrack> tracks;
+  private List<FilteredTrack> tracks;
+
+  public PlaylistRequest playlistRequest() {
+    return playlistRequest;
+  }
+
+  public boolean owner() {
+    return owner;
+  }
+
+  public List<FilteredTrack> tracks() {
+    return tracks;
+  }
 
 }

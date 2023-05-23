@@ -6,6 +6,7 @@ import com.github.jabroekens.spotitube.service.api.EntityNotFoundException;
 import com.github.jabroekens.spotitube.service.api.user.IncorrectPasswordException;
 import com.github.jabroekens.spotitube.service.api.user.UserService;
 import jakarta.inject.Inject;
+import java.util.Map;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class DefaultUserService implements UserService {
@@ -21,7 +22,7 @@ public class DefaultUserService implements UserService {
 
     @Override
     public User getUser(String userId, String password) throws EntityNotFoundException, IncorrectPasswordException {
-        var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id=%s".formatted(userId)));
+        var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, Map.of("id", userId)));
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new IncorrectPasswordException(user.getId());
         } else {

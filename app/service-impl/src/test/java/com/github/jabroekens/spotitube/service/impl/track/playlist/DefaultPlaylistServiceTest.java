@@ -60,15 +60,19 @@ class DefaultPlaylistServiceTest {
 
 	@Test
 	void throwsExceptionWhenCreatingPlaylistWithNonexistentOwner() {
+		var playlistRequest = toPlaylistRequest(Playlists.Empty());
 		when(userRepository.findById(any())).thenReturn(Optional.empty());
-		assertThrows(EntityNotFoundException.class, () -> sut.createPlaylist(toPlaylistRequest(Playlists.Empty())));
+		assertThrows(EntityNotFoundException.class, () -> sut.createPlaylist(playlistRequest));
 	}
 
 	@Test
 	void throwsExceptionWhenCreatingExistentPlaylist() {
+		var playlistRequest = toPlaylistRequest(Playlists.Empty());
 		when(userRepository.findById(any())).thenReturn(Optional.of(Users.JohnDoe()));
 		when(playlistRepository.add(any())).thenThrow(PersistenceException.class);
-		assertThrows(EntityExistsException.class, () -> sut.createPlaylist(toPlaylistRequest(Playlists.Empty())));
+
+		assertThrows(EntityExistsException.class, () -> sut.createPlaylist(playlistRequest));
+
 		verifyNoMoreInteractions(playlistRepository);
 	}
 
@@ -97,15 +101,19 @@ class DefaultPlaylistServiceTest {
 
 	@Test
 	void throwsExceptionWhenModifyingPlaylistWithNonexistentOwner() {
+		var playlistRequest = toPlaylistRequest(Playlists.Empty());
 		when(userRepository.findById(any())).thenReturn(Optional.empty());
-		assertThrows(EntityNotFoundException.class, () -> sut.modifyPlaylist(toPlaylistRequest(Playlists.Empty())));
+		assertThrows(EntityNotFoundException.class, () -> sut.modifyPlaylist(playlistRequest));
 	}
 
 	@Test
 	void throwsExceptionWhenModifyingNonexistentPlaylist() {
+		var playlistRequest = toPlaylistRequest(Playlists.Empty());
 		when(userRepository.findById(any())).thenReturn(Optional.of(Users.JohnDoe()));
 		when(playlistRepository.merge(any())).thenThrow(PersistenceException.class);
-		assertThrows(EntityNotFoundException.class, () -> sut.modifyPlaylist(toPlaylistRequest(Playlists.Empty())));
+
+		assertThrows(EntityNotFoundException.class, () -> sut.modifyPlaylist(playlistRequest));
+
 		verifyNoMoreInteractions(playlistRepository);
 	}
 
