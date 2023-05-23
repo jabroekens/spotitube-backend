@@ -4,6 +4,7 @@ import com.github.jabroekens.spotitube.model.Entity;
 import com.github.jabroekens.spotitube.persistence.api.PersistenceException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -51,8 +52,7 @@ public final class JdbcHelper {
                 var value = getValueForField(resultType, resultSet, field);
                 if (value != null) {
                     fieldsToSet.put(field, value);
-                } else if (fieldType.getAnnotation(Entity.class) != null) {
-                    // XXX ^ might break when field is array/interface/record etc.
+                } else if (fieldType.getAnnotation(Entity.class) != null && isRegularClass(fieldType)) {
                     fieldsToSet.put(field, toEntity(fieldType, resultSet));
                 }
             }
@@ -106,6 +106,10 @@ public final class JdbcHelper {
         } catch (SQLException ignored) {
             return null;
         }
+    }
+
+    private static <T> boolean isRegularClass(Class<T> type) {
+        return !(type.isArray() || Modifier.isAbstract(type.getModifiers()) || type.isRecord());
     }
 
     private static Class<?> wrapIfPrimitive(Class<?> type) {
