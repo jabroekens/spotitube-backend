@@ -6,41 +6,46 @@ import com.github.jabroekens.spotitube.model.track.Track;
 import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
 import com.github.jabroekens.spotitube.service.api.EntityExistsException;
 import com.github.jabroekens.spotitube.service.api.EntityNotFoundException;
+import java.util.Collection;
 import java.util.List;
 
 public interface PlaylistService {
 
 	/**
-	 * {@return the complete and modified collection of playlists}
+	 * {@return the created playlist}
 	 *
-	 * @param playlist the playlist to add.
+	 * @param playlistRequest the playlist to add.
 	 *
-	 * @throws EntityExistsException if the playerlist to be created already exists.
+	 * @throws EntityNotFoundException if the owner of the playlist to be created does not exist.
+	 * @throws EntityExistsException if the playlist to be created already exists.
 	 */
-	PlaylistCollection createPlaylist(@NotNullAndValid Playlist playlist) throws EntityExistsException;
+	Playlist createPlaylist(@NotNullAndValid PlaylistRequest playlistRequest)
+	  throws EntityNotFoundException, EntityExistsException;
 
 	/**
 	 * {@return the complete collection of playlists}
 	 */
-	PlaylistCollection getAllPlaylists();
+	Collection<Playlist> getAllPlaylists();
 
 	/**
-	 * {@return the complete and modified collection of playlists}
+	 * {@return the modified playlist}
 	 *
-	 * @param playlist the playlist to modify.
+	 * @param playlistRequest the playlist to modify.
 	 *
+	 * @throws EntityNotFoundException if the owner of the playlist to be created does not exist.
 	 * @throws EntityNotFoundException if the playlist to be modified doesn't exist.
 	 */
-	PlaylistCollection modifyPlaylist(@NotNullAndValid Playlist playlist) throws EntityNotFoundException;
+	Playlist modifyPlaylist(@NotNullAndValid PlaylistRequest playlistRequest)
+	  throws EntityNotFoundException, EntityExistsException;
 
 	/**
-	 * {@return the complete and modified collection of playlists}
+	 * Removes the playlist whose ID is {@code playlistId}.
 	 *
 	 * @param playlistId the ID of the playlist to remove.
 	 *
 	 * @throws EntityNotFoundException when no playlist has been found with ID {@code playlistId}.
 	 */
-	PlaylistCollection removePlaylist(@GeneratedId int playlistId) throws EntityNotFoundException;
+	void removePlaylist(@GeneratedId int playlistId) throws EntityNotFoundException;
 
 	/**
 	 * {@return the complete list of tracks for the playlist matching the specified ID}

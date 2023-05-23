@@ -8,11 +8,16 @@ import java.util.List;
 public interface TrackService {
 
 	/**
-	 * {@return the available tracks or the tracks not already in the playlist matching the specified ID}
+	 * {@return all available tracks}
+	 *
+	 * @throws EntityNotFoundException when no playlist has been found with ID {@code playlistId}.
+	 */
+	List<Track> getAvailableTracks() throws EntityNotFoundException;
+
+	/**
+	 * {@return the available tracks not already in the playlist matching the specified ID}
 	 *
 	 * @param playlistId the playlist whose tracks to exclude from the result.
-	 *
-	 * @return the available tracks.
 	 *
 	 * @throws EntityNotFoundException when no playlist has been found with ID {@code playlistId}.
 	 */
