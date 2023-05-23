@@ -1,5 +1,6 @@
 package com.github.jabroekens.spotitube.app.config.exception;
 
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 
@@ -23,7 +24,8 @@ public abstract class ExceptionMapperBase<T extends Throwable> implements Except
 	public final Response toResponse(T exception) {
 		var responseBuilder = Response
 		  .status(getStatus())
-		  .entity(new ExceptionResponse(exception.getMessage()));
+		  .entity(new ExceptionResponse(exception.getMessage()))
+		  .type(MediaType.APPLICATION_JSON);
 
 		return decorate(exception, responseBuilder).build();
 	}

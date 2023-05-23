@@ -8,6 +8,8 @@ mockito = "5.3.1"
 jakartaee-bom = { module = "jakarta.platform:jakarta.jakartaee-bom", version = "10.0.0" }
 spring-security-crypto = { module = "org.springframework.security:spring-security-crypto", version = "6.0.2" }
 
+jackson-provider = { module = "com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider", version = "2.15.1" }
+
 jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
 jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
 jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }

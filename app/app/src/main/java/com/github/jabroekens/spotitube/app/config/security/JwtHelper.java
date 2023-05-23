@@ -1,6 +1,7 @@
 package com.github.jabroekens.spotitube.app.config.security;
 
 import com.github.jabroekens.spotitube.model.user.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -39,11 +40,12 @@ public final class JwtHelper {
 		  .compact();
 	}
 
-	public static void validateToken(String token) throws JwtException {
-		Jwts.parserBuilder()
+	public static Claims validateToken(String token) throws JwtException {
+		return Jwts.parserBuilder()
 		  .setSigningKey(JWT_KEY_PAIR.getPublic())
 		  .build()
-		  .parseClaimsJws(token);
+		  .parseClaimsJws(token)
+		  .getBody();
 	}
 
 }
