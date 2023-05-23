@@ -1,5 +1,7 @@
 package com.github.jabroekens.spotitube.app.config.exception;
 
+import com.github.jabroekens.spotitube.model.track.Track;
+import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
 import com.github.jabroekens.spotitube.model.user.User;
 import com.github.jabroekens.spotitube.service.api.EntityExistsException;
 import jakarta.ws.rs.core.Response;
@@ -23,8 +25,15 @@ public class EntityExistsExceptionMapper extends ExceptionMapperBase<EntityExist
 	}
 
 	private String determineLocation(EntityExistsException exception) {
-		if (exception.getEntityType().equals(User.class)) {
-			return "/user/" + exception.getEntityId();
+		var entityType = exception.getEntityType();
+		var entityId = exception.getEntityId();
+
+		if (User.class.isAssignableFrom(entityType)) {
+			return "/users/" + entityId;
+		} else if (Playlist.class.isAssignableFrom(entityType)) {
+			return "/playlists/" + entityId;
+		} else if (Track.class.isAssignableFrom(entityType)) {
+			return "/tracks/" + entityId;
 		} else {
 			return "/";
 		}

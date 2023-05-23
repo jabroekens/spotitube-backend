@@ -4,7 +4,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
-public class DefaultExceptionMapper extends ExceptionMapperBase<Throwable> {
+public class DefaultExceptionMapper extends ExceptionMapperBase<RuntimeException> {
 
 	@Override
 	protected Response.Status getStatus() {
