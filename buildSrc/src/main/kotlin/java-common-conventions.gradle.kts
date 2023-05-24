@@ -85,6 +85,7 @@ tasks {
 	}
 
 	jacocoTestCoverageVerification {
+		executionData(integrationTest)
 		dependsOn(check)
 
 		violationRules {

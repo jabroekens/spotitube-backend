@@ -2,8 +2,10 @@ package com.github.jabroekens.spotitube.persistence.impl;
 
 import com.github.jabroekens.spotitube.model.Playlists;
 import com.github.jabroekens.spotitube.model.Tracks;
+import com.github.jabroekens.spotitube.persistence.api.PersistenceException;
 import com.github.jabroekens.spotitube.persistence.api.PlaylistRepository;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -37,26 +40,35 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 
 		assertTrue(savedPlaylist.getId().isPresent());
 		playlist.setId(savedPlaylist.getId().get());
-		assertEquals(playlist, savedPlaylist);
+		assertMatchesValueInDataStore(playlist, savedPlaylist, sut.findById(playlist.getId().get()));
 	}
 
 	@Test
 	@Override
-	void mergesSuccesfully() {
+	void throwsExceptionWhenAddingExistent() {
+		assertThrows(PersistenceException.class, () -> sut.add(Playlists.Empty()));
+	}
+
+	@Test
+	@Override
+	void mergesExistingSuccesfully() {
 		var playlist = Playlists.Empty();
 		playlist.addTrack(Tracks.AmericanLove());
 		playlist.setName("Songs");
 
 		var mergedPlaylist = sut.merge(playlist);
-		var savedPlaylist = sut.findById(playlist.getId().get());
+		assertMatchesValueInDataStore(playlist, mergedPlaylist, sut.findById(playlist.getId().get()));
+	}
 
-		savedPlaylist.ifPresentOrElse(
-		  (p) -> {
-			  assertEquals(playlist, mergedPlaylist);
-			  assertEquals(mergedPlaylist, p);
-		  },
-		  () -> fail("No value present")
-		);
+	@Test
+	@Override
+	void addsWhenMergingNonexistent() {
+		var playlist = Playlists.Videos();
+		var mergedPlaylist = sut.merge(playlist);
+
+		assertTrue(mergedPlaylist.getId().isPresent());
+		playlist.setId(mergedPlaylist.getId().get());
+		assertMatchesValueInDataStore(playlist, mergedPlaylist, sut.findById(playlist.getId().get()));
 	}
 
 	@Test
@@ -92,6 +104,12 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 		  () -> playlist1.ifPresentOrElse(u -> assertEquals(existingPlaylist, u), () -> fail("No value present")),
 		  () -> playlist2.ifPresentOrElse(u -> assertEquals(addedPlaylist, u), () -> fail("No value present"))
 		);
+	}
+
+	@Test
+	@Override
+	void findsNothingByNonexistentId() {
+		assertEquals(Optional.empty(), sut.findById(-1));
 	}
 
 }

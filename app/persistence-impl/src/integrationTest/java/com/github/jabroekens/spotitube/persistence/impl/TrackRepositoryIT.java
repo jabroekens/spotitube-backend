@@ -1,8 +1,10 @@
 package com.github.jabroekens.spotitube.persistence.impl;
 
 import com.github.jabroekens.spotitube.model.Tracks;
+import com.github.jabroekens.spotitube.persistence.api.PersistenceException;
 import com.github.jabroekens.spotitube.persistence.api.TrackRepository;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -36,13 +39,37 @@ class TrackRepositoryIT extends IntegrationTestBase {
 
 		assertTrue(savedTrack.getId().isPresent());
 		track.setId(savedTrack.getId().get());
-		assertEquals(track, savedTrack);
+		assertMatchesValueInDataStore(track, savedTrack, sut.findById(track.getId().get()));
 	}
 
 	@Test
 	@Override
-	void mergesSuccesfully() {
-		// Track is unmodifiable (from a domain perspective)
+	void throwsExceptionWhenAddingExistent() {
+		assertThrows(PersistenceException.class, () -> sut.add(Tracks.AmericanLove()));
+	}
+
+	@Test
+	@Override
+	void mergesExistingSuccesfully() {
+		var track = Tracks.DearNia();
+
+		// Track is unmodifiable (from a domain perspective),
+		// but this mimics modifications
+		track.setId(Tracks.AmericanLove().getId().get());
+
+		var mergedTrack = sut.merge(track);
+		assertMatchesValueInDataStore(track, mergedTrack, sut.findById(track.getId().get()));
+	}
+
+	@Test
+	@Override
+	void addsWhenMergingNonexistent() {
+		var track = Tracks.DearNia();
+		var mergedTrack = sut.merge(track);
+
+		assertTrue(mergedTrack.getId().isPresent());
+		track.setId(mergedTrack.getId().get());
+		assertMatchesValueInDataStore(track, mergedTrack, sut.findById(track.getId().get()));
 	}
 
 	@Test
@@ -78,6 +105,12 @@ class TrackRepositoryIT extends IntegrationTestBase {
 		  () -> track1.ifPresentOrElse(u -> assertEquals(existingTrack, u), () -> fail("No value present")),
 		  () -> track2.ifPresentOrElse(u -> assertEquals(addedTrack, u), () -> fail("No value present"))
 		);
+	}
+
+	@Test
+	@Override
+	void findsNothingByNonexistentId() {
+		assertEquals(Optional.empty(), sut.findById(-1));
 	}
 
 }

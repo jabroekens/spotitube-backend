@@ -109,7 +109,9 @@ public class JdbcUserRepository implements UserRepository {
             user.getPasswordHash(), user.getName(), user.getId()
           )
         ) {
-            stmt.executeUpdate();
+            if (stmt.executeUpdate() == 0) {
+                return add(user);
+            }
             return new User(user);
         } catch (SQLException e) {
             throw new PersistenceException(e);

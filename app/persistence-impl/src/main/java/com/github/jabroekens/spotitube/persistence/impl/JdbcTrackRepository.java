@@ -119,8 +119,9 @@ public class JdbcTrackRepository implements TrackRepository {
 
 	@Override
 	public Track merge(Track track) throws PersistenceException {
-		if (track.getId().isEmpty()) {
-			throw new PersistenceException();
+		var trackId = track.getId();
+		if (trackId.isEmpty()) {
+			return add(track);
 		}
 
 		try (
@@ -130,7 +131,7 @@ public class JdbcTrackRepository implements TrackRepository {
 			track.getTitle(), track.getPerformer().getId(), track.getDuration(), track.isOfflineAvailable(),
 			(track.getAlbum() != null ? track.getAlbum().getName() : null),
 			track.getPlayCount(), track.getPublicationDate().orElse(null), track.getDescription().orElse(null),
-			track.getId()
+			trackId.get()
 		  )
 		) {
 			stmt.executeUpdate();

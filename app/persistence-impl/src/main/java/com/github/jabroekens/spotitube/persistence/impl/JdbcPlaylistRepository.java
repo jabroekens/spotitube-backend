@@ -178,7 +178,7 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 	public Playlist merge(Playlist playlist) throws PersistenceException {
 		var playlistId = playlist.getId();
 		if (playlistId.isEmpty()) {
-			throw new PersistenceException();
+			return add(playlist);
 		}
 
 		try (var conn = dataSource.getConnection()) {
@@ -187,6 +187,7 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
+
 	}
 
 	private static Playlist mergePlaylist(Playlist playlist, Connection conn, int playlistId) throws SQLException {
@@ -203,7 +204,7 @@ public class JdbcPlaylistRepository implements PlaylistRepository {
 			conn.rollback();
 		}
 
-		return playlist;
+		return new Playlist(playlist);
 	}
 
 	private static void reinsertTracks(List<Track> tracks, Connection conn, int playlistId) throws SQLException {

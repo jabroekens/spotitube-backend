@@ -2,8 +2,10 @@ package com.github.jabroekens.spotitube.persistence.impl;
 
 import com.github.jabroekens.spotitube.model.Performers;
 import com.github.jabroekens.spotitube.model.Users;
+import com.github.jabroekens.spotitube.persistence.api.PersistenceException;
 import com.github.jabroekens.spotitube.persistence.api.UserRepository;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -31,26 +34,33 @@ class UserRepositoryIT extends IntegrationTestBase {
     @Test
     @Override
     void addsSuccesfully() {
-        var savedUser = sut.add(Users.JaneDoe());
-        assertEquals(Users.JaneDoe(), savedUser);
+        var user = Users.JaneDoe();
+        var savedUser = sut.add(user);
+        assertMatchesValueInDataStore(user, savedUser, sut.findById(user.getId()));
     }
 
     @Test
     @Override
-    void mergesSuccesfully() {
+    void throwsExceptionWhenAddingExistent() {
+        assertThrows(PersistenceException.class, () -> sut.add(Users.JohnDoe()));
+    }
+
+    @Test
+    @Override
+    void mergesExistingSuccesfully() {
         var user = Users.JohnDoe();
         user.setName("John Smith");
 
         var mergedUser = sut.merge(user);
-        var savedUser = sut.findById(user.getId());
+        assertMatchesValueInDataStore(user, mergedUser, sut.findById(user.getId()));
+    }
 
-        savedUser.ifPresentOrElse(
-          (u) -> {
-              assertEquals(user, mergedUser);
-              assertEquals(mergedUser, u);
-          },
-          () -> fail("No value present")
-        );
+    @Test
+    @Override
+    void addsWhenMergingNonexistent() {
+        var user = Users.JaneDoe();
+        var merged = sut.merge(user);
+        assertMatchesValueInDataStore(user, merged, sut.findById(user.getId()));
     }
 
     @Test
@@ -90,6 +100,12 @@ class UserRepositoryIT extends IntegrationTestBase {
     }
 
     @Test
+    @Override
+    void findsNothingByNonexistentId() {
+        assertEquals(Optional.empty(), sut.findById("_"));
+    }
+
+    @Test
     void findsByName() {
         sut.add(Users.JaneDoe());
 
@@ -100,6 +116,11 @@ class UserRepositoryIT extends IntegrationTestBase {
           () -> user1.ifPresentOrElse(u -> assertEquals(Users.JohnDoe(), u), () -> fail("No value present")),
           () -> user2.ifPresentOrElse(u -> assertEquals(Users.JaneDoe(), u), () -> fail("No value present"))
         );
+    }
+
+    @Test
+    void findsNothingByNonexistentName() {
+        assertEquals(Optional.empty(), sut.findByName("Clair Patterson"));
     }
 
 }

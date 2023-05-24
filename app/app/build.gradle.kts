@@ -41,7 +41,8 @@ tasks {
 		violationRules {
 			repeat(rules.size) {
 				rules[it].excludes = mutableListOf(
-					"com.github.jabroekens.spotitube.app.config.**"
+					"com.github.jabroekens.spotitube.app.config.**",
+					"com.github.jabroekens.spotitube.app.**.dto.*"
 				).apply {
 					addAll(rules[it].excludes)
 				}
