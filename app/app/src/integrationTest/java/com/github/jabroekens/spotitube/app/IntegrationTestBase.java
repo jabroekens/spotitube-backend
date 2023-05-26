@@ -1,12 +1,13 @@
 package com.github.jabroekens.spotitube.app;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jabroekens.spotitube.app.resource.user.LoginResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.regex.Pattern;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.testcontainers.containers.DockerComposeContainer;
 
 import static org.junit.Assert.assertEquals;
@@ -45,7 +46,7 @@ abstract class IntegrationTestBase {
     protected static void assertResponse(int statusCode, String body, HttpResponse<String> response) {
         assertAll(
           () -> assertEquals(statusCode, response.statusCode()),
-          () -> assertEquals(body, response.body())
+          () -> JSONAssert.assertEquals(body, response.body(), JSONCompareMode.STRICT)
         );
     }
 
@@ -54,10 +55,6 @@ abstract class IntegrationTestBase {
           () -> assertEquals(statusCode, response.statusCode()),
           () -> assertTrue(bodyPattern.matcher(response.body()).matches())
         );
-    }
-
-    protected static String minifyJson(String json) throws JsonProcessingException {
-        return new ObjectMapper().readTree(json).toString();
     }
 
 }

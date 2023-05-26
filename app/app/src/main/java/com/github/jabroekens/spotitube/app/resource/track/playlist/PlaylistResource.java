@@ -1,11 +1,11 @@
 package com.github.jabroekens.spotitube.app.resource.track.playlist;
 
 import com.github.jabroekens.spotitube.app.config.security.Secured;
-import com.github.jabroekens.spotitube.app.resource.track.dto.PlaylistTracksResponse;
+import com.github.jabroekens.spotitube.app.resource.track.dto.FilteredTrackRequest;
+import com.github.jabroekens.spotitube.app.resource.track.dto.FilteredTracksResponse;
 import com.github.jabroekens.spotitube.app.resource.track.playlist.dto.FilteredPlaylistRequest;
-import com.github.jabroekens.spotitube.app.resource.track.playlist.dto.FilteredTrack;
-import com.github.jabroekens.spotitube.app.resource.track.playlist.dto.PlaylistsResponse;
-import com.github.jabroekens.spotitube.model.track.Track;
+import com.github.jabroekens.spotitube.app.resource.track.playlist.dto.FilteredPlaylistsResponse;
+import com.github.jabroekens.spotitube.service.api.track.TrackRequest;
 import com.github.jabroekens.spotitube.service.api.track.playlist.PlaylistRequest;
 import com.github.jabroekens.spotitube.service.api.track.playlist.PlaylistService;
 import jakarta.inject.Inject;
@@ -37,7 +37,7 @@ public class PlaylistResource {
     @GET
     public Response getAllPlaylists() {
         var authenticatedUser = securityContext.getUserPrincipal().getName();
-        var playlistsResponse = PlaylistsResponse.fromPlaylists(
+        var playlistsResponse = new FilteredPlaylistsResponse(
           playlistService.getAllPlaylists(),
           authenticatedUser
         );
@@ -69,13 +69,13 @@ public class PlaylistResource {
     @Path("{id}/tracks")
     public Response getPlaylistTracks(@PathParam("id") int playlistId) {
         var tracks = playlistService.getPlaylistTracks(playlistId);
-        return Response.ok(PlaylistTracksResponse.fromTracks(tracks)).build();
+        return Response.ok(new FilteredTracksResponse(tracks)).build();
     }
 
     @POST
     @Path("{id}/tracks")
-    public Response addPlaylistTrack(@PathParam("id") int playlistId, FilteredTrack filteredTrack) {
-        playlistService.addTrackToPlaylist(playlistId, filteredTrack.track().getId().orElseThrow());
+    public Response addPlaylistTrack(@PathParam("id") int playlistId, FilteredTrackRequest filteredTrackRequest) {
+        playlistService.addTrackToPlaylist(playlistId, filteredTrackRequest.id());
         return getPlaylistTracks(playlistId);
     }
 
@@ -93,11 +93,26 @@ public class PlaylistResource {
         // playlist-to-be-made's owner to be the authenticated user as
         // required by our domain model (a playlist must have an owner)
         return new PlaylistRequest(
-          filteredPlaylistRequest.playlistRequest().id(),
-          filteredPlaylistRequest.playlistRequest().name(),
+          filteredPlaylistRequest.id(),
+          filteredPlaylistRequest.name(),
           authenticatedUser,
           Optional.ofNullable(filteredPlaylistRequest.tracks()).orElse(List.of())
-            .stream().map(ft -> new Track(ft.track())).toList()
+            .stream().map(PlaylistResource::toTrackRequest).toList()
+        );
+    }
+
+    private static TrackRequest toTrackRequest(FilteredTrackRequest filteredTrackRequest) {
+        // Ignore FilteredTrackRequest's `performer` value; that's the names not the ID.
+        return new TrackRequest(
+          filteredTrackRequest.id(),
+          filteredTrackRequest.title(),
+          null,
+          filteredTrackRequest.duration(),
+          filteredTrackRequest.offlineAvailable(),
+          filteredTrackRequest.album(),
+          filteredTrackRequest.playCount(),
+          filteredTrackRequest.publicationDate(),
+          filteredTrackRequest.description()
         );
     }
 

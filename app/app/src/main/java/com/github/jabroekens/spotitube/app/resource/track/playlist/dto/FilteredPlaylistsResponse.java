@@ -6,20 +6,20 @@ import java.util.Collection;
 import java.util.stream.IntStream;
 
 /**
- * A collection of {@link FilteredPlaylist playlists}.
+ * A collection of {@link FilteredPlaylistRequest playlists}.
  *
  * @param length    the total length in seconds of all the tracks in the playlists.
  * @param playlists the playlists.
  */
-public record PlaylistsResponse(
+public record FilteredPlaylistsResponse(
   int length,
-  Collection<FilteredPlaylist> playlists
+  Collection<FilteredPlaylistRequest> playlists
 ) {
 
-	public static PlaylistsResponse fromPlaylists(Collection<Playlist> playlists, String authenticatedUser) {
-		return new PlaylistsResponse(
-		  playlists.stream().flatMapToInt(PlaylistsResponse::getTracksDurationStream).sum(),
-		  playlists.stream().map(p -> FilteredPlaylist.fromPlaylist(p, authenticatedUser)).toList()
+	public FilteredPlaylistsResponse(Collection<Playlist> playlists, String authenticatedUser) {
+		this(
+		  playlists.stream().flatMapToInt(FilteredPlaylistsResponse::getTracksDurationStream).sum(),
+		  playlists.stream().map(p -> new FilteredPlaylistRequest(p, authenticatedUser)).toList()
 		);
 	}
 

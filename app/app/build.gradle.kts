@@ -16,8 +16,8 @@ dependencies {
 	implementation("jakarta.inject:jakarta.inject-api")
 	implementation("jakarta.ws.rs:jakarta.ws.rs-api")
 
-	implementation(libs.jackson.provider)
-	integrationTestImplementation(libs.jackson.provider)
+	integrationTestImplementation(libs.jackson.databind)
+	integrationTestImplementation(libs.jsonassert)
 
 	implementation(libs.jjwt.api)
 	runtimeOnly(libs.jjwt.impl)

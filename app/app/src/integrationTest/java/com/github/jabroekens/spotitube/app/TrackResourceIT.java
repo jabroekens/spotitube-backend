@@ -15,7 +15,7 @@ class TrackResourceIT extends IntegrationTestBase {
 
 	@Test
 	void listsAllTracks() throws IOException, InterruptedException {
-		var expectedResponse = minifyJson("""
+		var expectedResponse = """
           {
             "tracks": [
               {
@@ -24,10 +24,8 @@ class TrackResourceIT extends IntegrationTestBase {
                 "duration": 179,
                 "offlineAvailable": true,
                 "playCount": 0,
-                "description": null,
                 "performer": "Smallpools",
-                "album": "Lovetap!",
-                "publicationDate": null
+                "album": "Lovetap!"
               },
               {
                 "id": 2,
@@ -37,12 +35,11 @@ class TrackResourceIT extends IntegrationTestBase {
                 "playCount": 28613533,
                 "description": "The Egg. Story by Andy Weir, Animated by Kurzgesagt",
                 "performer": "Kurzgesagt - In a Nutshell",
-                "album": null,
                 "publicationDate": "09-01-2019"
               }
             ]
           }
-          """);
+          """;
 
 		assertRequiresAuthentication(httpClient.get("/tracks"));
 		assertResponse(200, expectedResponse, httpClient.get("/tracks?token=" + AUTH_TOKEN));
@@ -50,7 +47,7 @@ class TrackResourceIT extends IntegrationTestBase {
 
 	@Test
 	void listsAllTracksNotInSpecifiedPlaylist() throws IOException, InterruptedException {
-		var expectedResponse = minifyJson("""
+		var expectedResponse = """
           {
             "tracks": [
               {
@@ -61,12 +58,11 @@ class TrackResourceIT extends IntegrationTestBase {
                 "playCount": 28613533,
                 "description": "The Egg. Story by Andy Weir, Animated by Kurzgesagt",
                 "performer": "Kurzgesagt - In a Nutshell",
-                "album": null,
                 "publicationDate": "09-01-2019"
               }
             ]
           }
-          """);
+          """;
 
 		assertRequiresAuthentication(httpClient.get("/tracks?forPlaylist=1"));
 		assertResponse(200, expectedResponse, httpClient.get("/tracks?forPlaylist=1&token=" + AUTH_TOKEN));

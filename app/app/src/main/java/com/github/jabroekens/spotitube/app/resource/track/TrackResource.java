@@ -1,7 +1,7 @@
 package com.github.jabroekens.spotitube.app.resource.track;
 
 import com.github.jabroekens.spotitube.app.config.security.Secured;
-import com.github.jabroekens.spotitube.app.resource.track.dto.PlaylistTracksResponse;
+import com.github.jabroekens.spotitube.app.resource.track.dto.FilteredTracksResponse;
 import com.github.jabroekens.spotitube.model.track.Track;
 import com.github.jabroekens.spotitube.service.api.track.TrackService;
 import jakarta.inject.Inject;
@@ -30,7 +30,7 @@ public class TrackResource {
 			tracks = trackService.getAvailableTracks();
 		}
 
-		return Response.ok(PlaylistTracksResponse.fromTracks(tracks)).build();
+		return Response.ok(new FilteredTracksResponse(tracks)).build();
 	}
 
 }

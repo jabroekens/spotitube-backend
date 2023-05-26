@@ -9,6 +9,7 @@ import com.github.jabroekens.spotitube.persistence.api.TrackRepository;
 import com.github.jabroekens.spotitube.persistence.api.UserRepository;
 import com.github.jabroekens.spotitube.service.api.EntityExistsException;
 import com.github.jabroekens.spotitube.service.api.EntityNotFoundException;
+import com.github.jabroekens.spotitube.service.api.track.TrackRequest;
 import com.github.jabroekens.spotitube.service.api.track.playlist.PlaylistRequest;
 import com.github.jabroekens.spotitube.service.api.track.playlist.PlaylistService;
 import jakarta.inject.Inject;
@@ -31,9 +32,9 @@ public class DefaultPlaylistService implements PlaylistService {
 
 	@Override
 	public Playlist createPlaylist(PlaylistRequest playlistRequest) throws EntityExistsException {
-		var owner = userRepository.findById(playlistRequest.owner());
+		var owner = userRepository.findById(playlistRequest.ownerId());
 		if (owner.isPresent()) {
-			var playlist = new Playlist(playlistRequest.name(), owner.get(), playlistRequest.tracks());
+			var playlist = new Playlist(playlistRequest.name(), owner.get(), toTracks(playlistRequest.tracks()));
 			if (playlistRequest.id() > 0) {
 				playlist.setId(playlistRequest.id());
 			}
@@ -44,7 +45,7 @@ public class DefaultPlaylistService implements PlaylistService {
 				throw new EntityExistsException(Playlist.class, playlist.getId().orElseThrow());
 			}
 		} else {
-			throw new EntityNotFoundException(User.class, Map.of("id", playlistRequest.owner()));
+			throw new EntityNotFoundException(User.class, Map.of("id", playlistRequest.ownerId()));
 		}
 	}
 
@@ -55,9 +56,9 @@ public class DefaultPlaylistService implements PlaylistService {
 
 	@Override
 	public Playlist modifyPlaylist(PlaylistRequest playlistRequest) throws EntityNotFoundException {
-		var owner = userRepository.findById(playlistRequest.owner());
+		var owner = userRepository.findById(playlistRequest.ownerId());
 		if (owner.isPresent()) {
-			var playlist = new Playlist(playlistRequest.name(), owner.get(), playlistRequest.tracks());
+			var playlist = new Playlist(playlistRequest.name(), owner.get(), toTracks(playlistRequest.tracks()));
 			playlist.setId(playlistRequest.id());
 
 			try {
@@ -66,7 +67,7 @@ public class DefaultPlaylistService implements PlaylistService {
 				throw new EntityNotFoundException(Playlist.class, Map.of("name", playlist.getName(), "owner", playlist.getOwner().getId()));
 			}
 		} else {
-			throw new EntityNotFoundException(User.class, Map.of("id", playlistRequest.owner()));
+			throw new EntityNotFoundException(User.class, Map.of("id", playlistRequest.ownerId()));
 		}
 	}
 
@@ -109,6 +110,17 @@ public class DefaultPlaylistService implements PlaylistService {
 		}
 
 		return playlistRepository.merge(playlist).getTracks();
+	}
+
+	private static List<Track> toTracks(List<TrackRequest> trackRequests) {
+		// This is a code smell, because the business layer shouldn't
+		// know what information the persistence layer uses (i.e. 'ID only').
+		// However, this prevents having to fetch unnecessarily tracks eagerly.
+		return trackRequests.stream().map(tr -> {
+			var track = new Track(null, null, 0, false, null);
+			track.setId(tr.id());
+			return track;
+		}).toList();
 	}
 
 }

@@ -3,6 +3,7 @@ package com.github.jabroekens.spotitube.service.impl.track.playlist;
 import com.github.jabroekens.spotitube.model.Playlists;
 import com.github.jabroekens.spotitube.model.Tracks;
 import com.github.jabroekens.spotitube.model.Users;
+import com.github.jabroekens.spotitube.model.track.Track;
 import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
 import com.github.jabroekens.spotitube.persistence.api.PersistenceException;
 import com.github.jabroekens.spotitube.persistence.api.PlaylistRepository;
@@ -10,6 +11,7 @@ import com.github.jabroekens.spotitube.persistence.api.TrackRepository;
 import com.github.jabroekens.spotitube.persistence.api.UserRepository;
 import com.github.jabroekens.spotitube.service.api.EntityExistsException;
 import com.github.jabroekens.spotitube.service.api.EntityNotFoundException;
+import com.github.jabroekens.spotitube.service.api.track.TrackRequest;
 import com.github.jabroekens.spotitube.service.api.track.playlist.PlaylistRequest;
 import java.util.List;
 import java.util.Optional;
@@ -255,7 +257,21 @@ class DefaultPlaylistServiceTest {
 		  playlist.getId().orElse(-1),
 		  playlist.getName(),
 		  playlist.getOwner().getId(),
-		  playlist.getTracks()
+		  playlist.getTracks().stream().map(DefaultPlaylistServiceTest::toTrackRequest).toList()
+		);
+	}
+
+	private static TrackRequest toTrackRequest(Track track) {
+		return new TrackRequest(
+		  track.getId().orElse(-1),
+		  track.getTitle(),
+		  track.getPerformer().getId(),
+		  track.getDuration(),
+		  track.isOfflineAvailable(),
+		  (track.getAlbum() != null ? track.getAlbum().getName() : null),
+		  track.getPlayCount(),
+		  track.getPublicationDate().map(pd -> pd.format(TrackRequest.DATE_FORMAT)).orElse(null),
+		  track.getDescription().orElse(null)
 		);
 	}
 

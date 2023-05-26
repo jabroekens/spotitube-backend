@@ -20,7 +20,7 @@ class PlaylistResourceIT extends IntegrationTestBase {
 	@Test
 	@Order(1)
 	void listsAllPlaylists() throws IOException, InterruptedException {
-		var expectedResponse = minifyJson("""
+		var expectedResponse = """
           {
             "length": 653,
             "playlists": [
@@ -35,10 +35,8 @@ class PlaylistResourceIT extends IntegrationTestBase {
                     "duration": 179,
                     "offlineAvailable": true,
                     "playCount": 0,
-                    "description": null,
                     "performer": "Smallpools",
-                    "album": "Lovetap!",
-                    "publicationDate": null
+                    "album": "Lovetap!"
                   },
                   {
                     "id": 2,
@@ -48,7 +46,6 @@ class PlaylistResourceIT extends IntegrationTestBase {
                     "playCount": 28613533,
                     "description": "The Egg. Story by Andy Weir, Animated by Kurzgesagt",
                     "performer": "Kurzgesagt - In a Nutshell",
-                    "album": null,
                     "publicationDate": "09-01-2019"
                   }
                 ],
@@ -56,7 +53,7 @@ class PlaylistResourceIT extends IntegrationTestBase {
               }
             ]
           }
-          """);
+          """;
 
 		assertRequiresAuthentication(httpClient.get("/playlists"));
 		assertResponse(200, expectedResponse, httpClient.get("/playlists?token=" + AUTH_TOKEN));
@@ -65,14 +62,14 @@ class PlaylistResourceIT extends IntegrationTestBase {
 	@Test
 	@Order(2)
 	void deletesPlaylistAndListsAllPlaylists() throws IOException, InterruptedException {
-		var expectedResponse = minifyJson("""
+		var expectedResponse = """
           {
             "length": 0,
             "playlists": [
               { "id": 1, "name": "Empty", "tracks": [], "owner": true }
             ]
           }
-          """);
+          """;
 
 		assertRequiresAuthentication(httpClient.delete("/playlists/2"));
 		assertResponse(200, expectedResponse, httpClient.delete("/playlists/2?token=" + AUTH_TOKEN));
@@ -82,7 +79,7 @@ class PlaylistResourceIT extends IntegrationTestBase {
 	@Test
 	@Order(3)
 	void addsPlaylistAndListsAllPlaylists() throws IOException, InterruptedException {
-		var expectedResponse = minifyJson("""
+		var expectedResponse = """
           {
             "length": 0,
             "playlists": [
@@ -90,7 +87,7 @@ class PlaylistResourceIT extends IntegrationTestBase {
               { "id": 3, "name": "Progressive Rock", "tracks": [], "owner": true }
             ]
           }
-          """);
+          """;
 
 		var playlist = """
           { "id": -1, "name": "Progressive Rock", "tracks": [], "owner": false }
@@ -103,7 +100,7 @@ class PlaylistResourceIT extends IntegrationTestBase {
 	@Test
 	@Order(4)
 	void editsPlaylistAndListsAllPlaylists() throws IOException, InterruptedException {
-		var expectedResponse = minifyJson("""
+		var expectedResponse = """
           {
             "length": 474,
             "playlists": [
@@ -120,7 +117,6 @@ class PlaylistResourceIT extends IntegrationTestBase {
                     "playCount": 28613533,
                     "description": "The Egg. Story by Andy Weir, Animated by Kurzgesagt",
                     "performer": "Kurzgesagt - In a Nutshell",
-                    "album": null,
                     "publicationDate": "09-01-2019"
                   }
                 ],
@@ -128,7 +124,7 @@ class PlaylistResourceIT extends IntegrationTestBase {
               }
             ]
           }
-          """);
+          """;
 
 		var playlist = """
           {
@@ -143,7 +139,6 @@ class PlaylistResourceIT extends IntegrationTestBase {
                 "playCount": 28613533,
                 "description": "The Egg. Story by Andy Weir, Animated by Kurzgesagt",
                 "performer": "Kurzgesagt - In a Nutshell",
-                "album": null,
                 "publicationDate": "09-01-2019"
               }
             ],
@@ -158,7 +153,7 @@ class PlaylistResourceIT extends IntegrationTestBase {
 	@Test
 	@Order(5)
 	void listsAvailableTracks() throws IOException, InterruptedException {
-		var expectedResponse = minifyJson("""
+		var expectedResponse = """
           {
             "tracks": [
               {
@@ -169,12 +164,11 @@ class PlaylistResourceIT extends IntegrationTestBase {
                 "playCount": 28613533,
                 "description": "The Egg. Story by Andy Weir, Animated by Kurzgesagt",
                 "performer": "Kurzgesagt - In a Nutshell",
-                "album": null,
                 "publicationDate": "09-01-2019"
               }
             ]
           }
-          """);
+          """;
 
 		assertRequiresAuthentication(httpClient.get("/playlists/1/tracks"));
 		assertResponse(200, expectedResponse, httpClient.get("/playlists/1/tracks?token=" + AUTH_TOKEN));
@@ -183,7 +177,7 @@ class PlaylistResourceIT extends IntegrationTestBase {
 	@Test
 	@Order(6)
 	void addsTrackToPlaylistAndListsPlaylistTracks() throws IOException, InterruptedException {
-		var expectedResponse = minifyJson("""
+		var expectedResponse = """
           {
             "tracks": [
               {
@@ -192,10 +186,8 @@ class PlaylistResourceIT extends IntegrationTestBase {
                 "duration": 179,
                 "offlineAvailable": true,
                 "playCount": 0,
-                "description": null,
                 "performer": "Smallpools",
-                "album": "Lovetap!",
-                "publicationDate": null
+                "album": "Lovetap!"
               },
               {
                 "id": 2,
@@ -205,12 +197,11 @@ class PlaylistResourceIT extends IntegrationTestBase {
                 "playCount": 28613533,
                 "description": "The Egg. Story by Andy Weir, Animated by Kurzgesagt",
                 "performer": "Kurzgesagt - In a Nutshell",
-                "album": null,
                 "publicationDate": "09-01-2019"
               }
             ]
           }
-          """);
+          """;
 
 		var track = """
           {
@@ -219,10 +210,8 @@ class PlaylistResourceIT extends IntegrationTestBase {
             "duration": 179,
             "offlineAvailable": true,
             "playCount": 0,
-            "description": null,
             "performer": "Smallpools",
-            "album": "Lovetap!",
-            "publicationDate": null
+            "album": "Lovetap!"
           }
           """;
 
@@ -233,7 +222,7 @@ class PlaylistResourceIT extends IntegrationTestBase {
 	@Test
 	@Order(7)
 	void removesTrackFromPlaylistAndListsPlaylistTracks() throws IOException, InterruptedException {
-		var expectedResponse = minifyJson("""
+		var expectedResponse = """
           {
             "tracks": [
               {
@@ -242,14 +231,12 @@ class PlaylistResourceIT extends IntegrationTestBase {
                 "duration": 179,
                 "offlineAvailable": true,
                 "playCount": 0,
-                "description": null,
                 "performer": "Smallpools",
-                "album": "Lovetap!",
-                "publicationDate": null
+                "album": "Lovetap!"
               }
             ]
           }
-          """);
+          """;
 
 		assertRequiresAuthentication(httpClient.delete("/playlists/1/tracks/2"));
 		assertResponse(200, expectedResponse, httpClient.delete("/playlists/1/tracks/2?token=" + AUTH_TOKEN));
