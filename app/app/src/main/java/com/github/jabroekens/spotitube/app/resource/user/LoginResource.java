@@ -1,6 +1,8 @@
 package com.github.jabroekens.spotitube.app.resource.user;
 
 import com.github.jabroekens.spotitube.app.config.security.JwtHelper;
+import com.github.jabroekens.spotitube.app.resource.user.dto.LoginRequest;
+import com.github.jabroekens.spotitube.app.resource.user.dto.LoginResponse;
 import com.github.jabroekens.spotitube.service.api.user.UserService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;

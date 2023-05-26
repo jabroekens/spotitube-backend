@@ -1,7 +1,7 @@
 package com.github.jabroekens.spotitube.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jabroekens.spotitube.app.resource.user.LoginResponse;
+import com.github.jabroekens.spotitube.app.resource.user.dto.LoginResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpResponse;
