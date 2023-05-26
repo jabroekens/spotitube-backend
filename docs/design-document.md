@@ -18,87 +18,7 @@ It's implemented using at least the following frameworks/libraries:
 * JDBC
 
 ## Package Diagram
-```plantuml
-@startuml
-set separator none
-
-package spotitube as com.github.jabroekens.spotitube {
-    package model {
-        package track as model.track {
-            package playlist as model.track.playlist {
-            }
-        }
-        package user as model.user {
-        }
-    }
-
-    package app {
-        package config as app.config {
-            package exception as app.config.exception {
-            }
-            package security as app.config.security {
-            }
-        }
-        package resource as app.resource {
-            package track as app.resource.track {
-                package dto as app.resource.track.dto {
-                }
-                package playlist as app.resource.track.playlist {
-                    package dto as app.resource.track.playlist.dto {
-                    }
-                }
-            }
-            package user as app.resource.user {
-                package dto as app.resource.user.dto {
-                }
-            }
-        }
-    }
-
-    together {
-        package service.api {
-            package track as service.api.track {
-                package playlist as service.api.track.playlist {
-                }
-            }
-            package user as service.api.user {
-            }
-        }
-
-        package service.impl {
-            package track as service.impl.track {
-                package playlist as service.impl.track.playlist {
-                }
-            }
-            package user as service.impl.user {
-            }
-        }
-    }
-
-    together {
-        package persistence.api {
-        }
-
-        package persistence.impl {
-        }
-    }
-}
-
-"app" ..> "service.api" : <<access>>
-"app" ..> "service.impl" : <<use>>
-"app" ..> "persistence.impl" : <<use>>
-
-"service.api" ..> "model" : <<import>>
-"service.impl" ..> "service.api" : <<access>>
-"service.impl" ..> "persistence.api" : <<access>>
-
-"persistence.api" ..> "model" : <<import>>
-
-/' Purely for layout '/
-"persistence.api" -[hidden]> "service.api"
-"persistence.impl" -[hidden]> "service.api"
-@enduml
-```
+![Package Diagram](package-diagram.png)
 
 The [Layered Architecture](https://www.oreilly.com/library/view/software-architecture-patterns/9781491971437/ch01.html) pattern is used to differentiate between responsibilities within the application:
 * The `app` package equates to the Application Layer and is responsible for handling communication between the clients and the business layer.
@@ -112,31 +32,7 @@ The [Data Mapper](https://martinfowler.com/eaaCatalog/dataMapper.html) pattern i
 The domain model is kept as a separate package (`model`) as it is used across the layers.
 
 ## Deployment Diagram
-```plantuml
-frame Spotitube <<deployment>> {
-    node containerd <<executionEnvironment>> {
-        node "TomEE 9.0.0 MicroProfile" <<container>> as backend {
-            artifact "app.war"
-        }
-
-        database "PostgreSQL 15" <<container>> as db {
-            card User <<table>>
-            card Performer <<table>>
-            card Album <<table>>
-            card Track <<table>>
-            card Playlist <<table>>
-            card PlaylistTrack <<table>>
-        }
-    }
-
-    node "Nginx" <<web server>> as frontend {
-        artifact "Spotitube Frontend"
-    }
-}
-
-db -- backend : <<protocol>>\nTCP/IP
-frontend -- backend : <<protocol>>\nJSON/HTTP
-```
+![Deployment Diagram](deployment-diagram.png)
 
 The backend can be deployed on any Jakarta EE-compliant application server with the necessary implementations. For this project TomEE 9.0.0 MicroProfile is used.
 

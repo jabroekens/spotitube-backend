@@ -1,0 +1,25 @@
+@startuml
+frame Spotitube <<deployment>> {
+    node containerd <<executionEnvironment>> {
+        node "TomEE 9.0.0 MicroProfile" <<container>> as backend {
+            artifact "app.war"
+        }
+
+        database "PostgreSQL 15" <<container>> as db {
+            card User <<table>>
+            card Performer <<table>>
+            card Album <<table>>
+            card Track <<table>>
+            card Playlist <<table>>
+            card PlaylistTrack <<table>>
+        }
+    }
+
+    node "Nginx" <<web server>> as frontend {
+        artifact "Spotitube Frontend"
+    }
+}
+
+db -- backend : <<protocol>>\nTCP/IP
+frontend -- backend : <<protocol>>\nJSON/HTTP
+@enduml

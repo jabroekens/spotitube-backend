@@ -1,0 +1,79 @@
+@startuml
+set separator none
+
+package spotitube as com.github.jabroekens.spotitube {
+    package model {
+        package track as model.track {
+            package playlist as model.track.playlist {
+            }
+        }
+        package user as model.user {
+        }
+    }
+
+    package app {
+        package config as app.config {
+            package exception as app.config.exception {
+            }
+            package security as app.config.security {
+            }
+        }
+        package resource as app.resource {
+            package track as app.resource.track {
+                package dto as app.resource.track.dto {
+                }
+                package playlist as app.resource.track.playlist {
+                    package dto as app.resource.track.playlist.dto {
+                    }
+                }
+            }
+            package user as app.resource.user {
+                package dto as app.resource.user.dto {
+                }
+            }
+        }
+    }
+
+    together {
+        package service.api {
+            package track as service.api.track {
+                package playlist as service.api.track.playlist {
+                }
+            }
+            package user as service.api.user {
+            }
+        }
+
+        package service.impl {
+            package track as service.impl.track {
+                package playlist as service.impl.track.playlist {
+                }
+            }
+            package user as service.impl.user {
+            }
+        }
+    }
+
+    together {
+        package persistence.api {
+        }
+
+        package persistence.impl {
+        }
+    }
+}
+
+"app" ..> "service.api" : <<access>>
+"app" ..> "service.impl" : <<use>>
+"app" ..> "persistence.impl" : <<use>>
+
+"service.api" ..> "model" : <<import>>
+"service.impl" ..> "service.api" : <<access>>
+"service.impl" ..> "persistence.api" : <<access>>
+
+"persistence.api" ..> "model" : <<import>>
+
+/' Purely for layout '/
+"persistence.api" -[hidden]> "service.api"
+"persistence.impl" -[hidden]> "service.api"
+@enduml
