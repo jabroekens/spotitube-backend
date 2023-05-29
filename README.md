@@ -1,9 +1,9 @@
 # Spotitube
-_All your Spotify and YouTube places in one conventient overview_
+_All your Spotify and YouTube playlists in one conventient overview_
 
 ## Run
 ```
-gradle build -x check
+./gradlew build -x check
 docker compose -f docker/docker-compose.yaml up --build -d
 ```
 

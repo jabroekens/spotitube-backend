@@ -1,10 +1,10 @@
 # Spotitube Design Document
 
-Jens Broekens (1618608)
+Jens Broekens (1618608)  
 Teacher: Meron Brouwer
 
-Course: HBO-ICT/OOSE-DEA
-Date: May 26th, 2023
+Course: HBO-ICT/OOSE-DEA  
+Date: May 26th, 2023  
 Version: 1
 
 ## Introduction
