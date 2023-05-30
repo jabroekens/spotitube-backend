@@ -3,6 +3,7 @@ package com.github.jabroekens.spotitube.service.impl.track.playlist;
 import com.github.jabroekens.spotitube.model.track.Track;
 import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
 import com.github.jabroekens.spotitube.model.user.User;
+import com.github.jabroekens.spotitube.model.user.UserId;
 import com.github.jabroekens.spotitube.persistence.api.PersistenceException;
 import com.github.jabroekens.spotitube.persistence.api.PlaylistRepository;
 import com.github.jabroekens.spotitube.persistence.api.TrackRepository;
@@ -52,6 +53,11 @@ public class DefaultPlaylistService implements PlaylistService {
 	@Override
 	public Collection<Playlist> getAllPlaylists() {
 		return playlistRepository.findAll();
+	}
+
+	@Override
+	public Collection<Playlist> getUserPlaylists(@UserId String userId) {
+		return playlistRepository.findByUser(userId);
 	}
 
 	@Override

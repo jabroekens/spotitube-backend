@@ -4,6 +4,7 @@ import com.github.jabroekens.spotitube.model.NotNullAndValid;
 import com.github.jabroekens.spotitube.model.track.GeneratedId;
 import com.github.jabroekens.spotitube.model.track.Track;
 import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
+import com.github.jabroekens.spotitube.model.user.UserId;
 import com.github.jabroekens.spotitube.service.api.EntityExistsException;
 import com.github.jabroekens.spotitube.service.api.EntityNotFoundException;
 import java.util.Collection;
@@ -26,6 +27,11 @@ public interface PlaylistService {
 	 * {@return the complete collection of playlists}
 	 */
 	Collection<Playlist> getAllPlaylists();
+
+	/**
+	 * {@return the complete collection of playlists belonging to the specified user}
+	 */
+	Collection<Playlist> getUserPlaylists(@UserId String userId);
 
 	/**
 	 * {@return the modified playlist}

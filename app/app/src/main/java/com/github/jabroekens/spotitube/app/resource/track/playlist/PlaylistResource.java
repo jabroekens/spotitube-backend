@@ -1,5 +1,6 @@
 package com.github.jabroekens.spotitube.app.resource.track.playlist;
 
+import com.github.jabroekens.spotitube.app.config.security.Right;
 import com.github.jabroekens.spotitube.app.config.security.Secured;
 import com.github.jabroekens.spotitube.app.resource.track.dto.FilteredTrackRequest;
 import com.github.jabroekens.spotitube.app.resource.track.dto.FilteredTracksResponse;
@@ -44,22 +45,41 @@ public class PlaylistResource {
         return Response.ok(playlistsResponse).build();
     }
 
+    @GET
+    public Response getOwnPlaylists() {
+        var authenticatedUser = securityContext.getUserPrincipal().getName();
+        var playlistsResponse = new FilteredPlaylistsResponse(
+          playlistService.getUserPlaylists(authenticatedUser),
+          authenticatedUser
+        );
+        return Response.ok(playlistsResponse).build();
+    }
+
     @DELETE
     @Path("{id}")
-    public Response removePlaylist(@PathParam("id") int playlistId) {
+    public Response deleteAnyPlaylist(@PathParam("id") int playlistId) {
         playlistService.removePlaylist(playlistId);
         return getAllPlaylists();
     }
 
+    @Secured({Right.DeleteOtherPlaylist})
+    @DELETE
+    @Path("{id}")
+    public Response deleteOwnPlaylist(@PathParam("id") int playlistId) {
+        var authenticatedUser = securityContext.getUserPrincipal().getName();
+        playlistService.removePlaylist(authenticatedUser, playlistId);
+        return getAllPlaylists();
+    }
+
     @POST
-    public Response addPlaylist(FilteredPlaylistRequest filteredPlaylistRequest) {
+    public Response createPlaylist(FilteredPlaylistRequest filteredPlaylistRequest) {
         playlistService.createPlaylist(toPlaylistRequest(filteredPlaylistRequest));
         return getAllPlaylists();
     }
 
     @PUT
     @Path("{id}")
-    public Response editPlaylist(@PathParam("id") int playlistId, FilteredPlaylistRequest filteredPlaylistRequest) {
+    public Response modifyAnyPlaylist(@PathParam("id") int playlistId, FilteredPlaylistRequest filteredPlaylistRequest) {
         // TODO verify playlistId matches?
         playlistService.modifyPlaylist(toPlaylistRequest(filteredPlaylistRequest));
         return getAllPlaylists();
@@ -67,23 +87,23 @@ public class PlaylistResource {
 
     @GET
     @Path("{id}/tracks")
-    public Response getPlaylistTracks(@PathParam("id") int playlistId) {
+    public Response getAnyPlaylistTracks(@PathParam("id") int playlistId) {
         var tracks = playlistService.getPlaylistTracks(playlistId);
         return Response.ok(new FilteredTracksResponse(tracks)).build();
     }
 
     @POST
     @Path("{id}/tracks")
-    public Response addPlaylistTrack(@PathParam("id") int playlistId, FilteredTrackRequest filteredTrackRequest) {
+    public Response addAnyPlaylistTrack(@PathParam("id") int playlistId, FilteredTrackRequest filteredTrackRequest) {
         playlistService.addTrackToPlaylist(playlistId, filteredTrackRequest.id());
-        return getPlaylistTracks(playlistId);
+        return getAnyPlaylistTracks(playlistId);
     }
 
     @DELETE
     @Path("{id}/tracks/{trackId}")
-    public Response removePlaylistTrack(@PathParam("id") int playlistId, @PathParam("trackId") int trackId) {
+    public Response removeAnyPlaylistTrack(@PathParam("id") int playlistId, @PathParam("trackId") int trackId) {
         playlistService.removeTrackFromPlaylist(playlistId, trackId);
-        return getPlaylistTracks(playlistId);
+        return getAnyPlaylistTracks(playlistId);
     }
 
     private PlaylistRequest toPlaylistRequest(FilteredPlaylistRequest filteredPlaylistRequest) {
