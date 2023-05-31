@@ -1,6 +1,8 @@
 package com.github.jabroekens.spotitube.service.impl.track.playlist;
 
+import com.github.jabroekens.spotitube.model.track.Song;
 import com.github.jabroekens.spotitube.model.track.Track;
+import com.github.jabroekens.spotitube.model.track.Video;
 import com.github.jabroekens.spotitube.model.track.playlist.Playlist;
 import com.github.jabroekens.spotitube.model.user.User;
 import com.github.jabroekens.spotitube.persistence.api.PersistenceException;
@@ -117,7 +119,16 @@ public class DefaultPlaylistService implements PlaylistService {
 		// know what information the persistence layer uses (i.e. 'ID only').
 		// However, this prevents having to fetch unnecessarily tracks eagerly.
 		return trackRequests.stream().map(tr -> {
-			var track = new Track(null, null, 0, false, null);
+			Track track;
+
+			if (tr.albumId() != null) {
+				track = new Song(null, null, 0, false, null);
+			} else if (tr.playCount() != null) {
+				track = new Video(null, null, 0, false, 0, null, null);
+			} else {
+				throw new IllegalArgumentException("Unmappable track record");
+			}
+
 			track.setId(tr.id());
 			return track;
 		}).toList();

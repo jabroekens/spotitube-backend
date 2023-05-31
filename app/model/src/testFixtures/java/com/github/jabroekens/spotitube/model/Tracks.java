@@ -1,16 +1,18 @@
 package com.github.jabroekens.spotitube.model;
 
+import com.github.jabroekens.spotitube.model.track.Song;
 import com.github.jabroekens.spotitube.model.track.Track;
+import com.github.jabroekens.spotitube.model.track.Video;
 import java.time.LocalDate;
 
 public final class Tracks {
 
 	public static Track AmericanLove() {
-		return withId(1, new Track("American Love", Performers.Smallpools(), 179, true, Albums.Lovetap()));
+		return withId(1, new Song("American Love", Performers.Smallpools(), 179, true, Albums.Lovetap()));
 	}
 
 	public static Track TheEgg() {
-		return withId(2, new Track(
+		return withId(2, new Video(
 		  "The Egg - A Short Story", Performers.Kurzgesagt(), 474,
 		  false, 28613533,
 		  LocalDate.of(2019, 9, 1), "The Egg. Story by Andy Weir, Animated by Kurzgesagt"
@@ -18,7 +20,7 @@ public final class Tracks {
 	}
 
 	public static Track DearNia() {
-		return new Track(
+		return new Video(
 		  "Dear Nia", Performers.Exurb1a(), 677,
 		  false, 1397268,
 		  LocalDate.of(2022, 12, 3),

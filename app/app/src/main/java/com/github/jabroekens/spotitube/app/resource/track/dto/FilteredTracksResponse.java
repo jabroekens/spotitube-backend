@@ -9,7 +9,7 @@ public record FilteredTracksResponse(
 ) {
 
 	public FilteredTracksResponse(Collection<Track> tracks) {
-		this(tracks.stream().map(FilteredTrackRequest::new).toList());
+		this(tracks.stream().map(FilteredTrackRequest::fromTrack).toList());
 	}
 
 }

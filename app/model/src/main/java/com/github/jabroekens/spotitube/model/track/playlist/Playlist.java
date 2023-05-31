@@ -47,7 +47,7 @@ public class Playlist {
 		this(
 		  playlist.name,
 		  playlist.owner != null ? new User(playlist.owner) : null,
-		  playlist.tracks.stream().map(Track::new).collect(Collectors.toCollection(LinkedList::new))
+		  playlist.tracks.stream().map(t -> t.copy(t)).collect(Collectors.toCollection(LinkedList::new))
 		);
 		this.id = playlist.id;
 	}

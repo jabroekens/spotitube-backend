@@ -16,7 +16,7 @@ public record FilteredPlaylistRequest(
       playlist.getId().orElseThrow(),
       playlist.getName(),
       playlist.getOwner().getId().equals(authenticatedUser),
-      playlist.getTracks().stream().map(FilteredTrackRequest::new).toList()
+      playlist.getTracks().stream().map(FilteredTrackRequest::fromTrack).toList()
     );
   }
 

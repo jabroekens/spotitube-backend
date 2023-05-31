@@ -21,11 +21,21 @@ CREATE TABLE Track
     title            VARCHAR(255) NOT NULL,
     performer        VARCHAR(255) NOT NULL REFERENCES Performer (id) ON DELETE CASCADE ON UPDATE CASCADE,
     duration         INT          NOT NULL,
-    offlineAvailable BOOLEAN      NOT NULL,
-    album            VARCHAR(255) REFERENCES Album (name) ON DELETE CASCADE ON UPDATE CASCADE,
-    playCount        INT,
-    publicationDate  DATE,
-    description      VARCHAR(1024)
+    offlineAvailable BOOLEAN      NOT NULL
+);
+
+CREATE TABLE Song
+(
+    id    INT          NOT NULL REFERENCES Track (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    album VARCHAR(255) NOT NULL REFERENCES Album (name) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE Video
+(
+    id              INT NOT NULL REFERENCES Track (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    playCount       INT NOT NULL,
+    publicationDate DATE,
+    description     VARCHAR(1024)
 );
 
 CREATE TABLE Playlist
@@ -65,10 +75,15 @@ VALUES ('smallpools'),
 INSERT INTO Album (name)
 VALUES ('Lovetap!');
 
-INSERT INTO Track (title, performer, duration, offlineAvailable, album, playCount, publicationDate, description)
-VALUES ('American Love', 'smallpools', 179, true, 'Lovetap!', null, null, null),
-       ('The Egg - A Short Story', 'kurzgesagt', 474, false, null, 28613533, '2019-09-01',
-        'The Egg. Story by Andy Weir, Animated by Kurzgesagt');
+INSERT INTO Track (title, performer, duration, offlineAvailable)
+VALUES ('American Love', 'smallpools', 179, true),
+       ('The Egg - A Short Story', 'kurzgesagt', 474, false);
+
+INSERT INTO Song (id, album)
+VALUES (1, 'Lovetap!');
+
+INSERT INTO Video (id, playCount, publicationDate, description)
+VALUES (2, 28613533, '2019-09-01', 'The Egg. Story by Andy Weir, Animated by Kurzgesagt');
 
 INSERT INTO Playlist (name, owner)
 VALUES ('Empty', 'john'),
