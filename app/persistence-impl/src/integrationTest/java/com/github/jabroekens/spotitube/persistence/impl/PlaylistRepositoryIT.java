@@ -11,10 +11,10 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.apache.commons.collections4.CollectionUtils.isEqualCollection;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -85,10 +85,10 @@ class PlaylistRepositoryIT extends IntegrationTestBase {
 		  Playlists.Empty(), Playlists.Favorites()
 		).collect(Collectors.toCollection(ArrayList::new));
 
-		assertIterableEquals(expectedPlaylists, sut.findAll());
+		assertTrue(isEqualCollection(expectedPlaylists, sut.findAll()));
 
 		expectedPlaylists.add(sut.add(Playlists.Videos()));
-		assertIterableEquals(expectedPlaylists, sut.findAll());
+		assertTrue(isEqualCollection(expectedPlaylists, sut.findAll()));
 	}
 
 	@Test

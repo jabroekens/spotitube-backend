@@ -24,5 +24,7 @@ mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
 equalsverifier = { module = "nl.jqno.equalsverifier:equalsverifier", version = "3.11.1" }
 
+commons-collections4 = { module = "org.apache.commons:commons-collections4", version = "4.4" }
+
 testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version = "1.18.0" }
 postgresql = { module = "org.postgresql:postgresql", version = "42.5.0" }

@@ -11,10 +11,10 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.apache.commons.collections4.CollectionUtils.isEqualCollection;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -78,10 +78,10 @@ class UserRepositoryIT extends IntegrationTestBase {
           Performers.Kurzgesagt(), Performers.Exurb1a()
         ).collect(Collectors.toCollection(ArrayList::new));
 
-        assertIterableEquals(expectedUsers, sut.findAll());
+        assertTrue(isEqualCollection(expectedUsers, sut.findAll()));
 
         expectedUsers.add(sut.add(Users.JaneDoe()));
-        assertIterableEquals(expectedUsers, sut.findAll());
+        assertTrue(isEqualCollection(expectedUsers, sut.findAll()));
     }
 
     @Test

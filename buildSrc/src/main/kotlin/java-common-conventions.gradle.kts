@@ -35,6 +35,7 @@ testing {
 			dependencies {
 				implementation(project())
 				implementation(testFixtures(project(":app:model")))
+				implementation(libs.findLibrary("commons-collections4").get())
 				implementation(project.dependencies.testFixtures(project))
 			}
 

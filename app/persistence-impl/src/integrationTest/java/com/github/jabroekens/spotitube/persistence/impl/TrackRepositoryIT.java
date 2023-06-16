@@ -10,10 +10,10 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.apache.commons.collections4.CollectionUtils.isEqualCollection;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -86,10 +86,10 @@ class TrackRepositoryIT extends IntegrationTestBase {
 		 Tracks.AmericanLove(), Tracks.TheEgg()
 		).collect(Collectors.toCollection(ArrayList::new));
 
-		assertIterableEquals(expectedTracks, sut.findAll());
+		assertTrue(isEqualCollection(expectedTracks, sut.findAll()));
 
 		expectedTracks.add(sut.add(Tracks.DearNia()));
-		assertIterableEquals(expectedTracks, sut.findAll());
+		assertTrue(isEqualCollection(expectedTracks, sut.findAll()));
 	}
 
 	@Test
