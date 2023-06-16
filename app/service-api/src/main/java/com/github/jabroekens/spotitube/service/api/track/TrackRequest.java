@@ -13,7 +13,7 @@ public record TrackRequest(
   @Positive int duration,
   boolean offlineAvailable,
   @NotBlank String albumId,
-  @PositiveOrZero int playCount,
+  @PositiveOrZero Integer playCount,
   String publicationDate,
   String description
 ) {

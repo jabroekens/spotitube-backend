@@ -10,7 +10,7 @@ public record FilteredTrackRequest(
   int duration,
   boolean offlineAvailable,
   String album,
-  int playCount,
+  Integer playCount,
   String publicationDate,
   String description
 ) {

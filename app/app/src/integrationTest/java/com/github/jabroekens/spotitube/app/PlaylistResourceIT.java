@@ -34,7 +34,6 @@ class PlaylistResourceIT extends IntegrationTestBase {
                     "title": "American Love",
                     "duration": 179,
                     "offlineAvailable": true,
-                    "playCount": 0,
                     "performer": "Smallpools",
                     "album": "Lovetap!"
                   },
@@ -185,7 +184,6 @@ class PlaylistResourceIT extends IntegrationTestBase {
                 "title": "American Love",
                 "duration": 179,
                 "offlineAvailable": true,
-                "playCount": 0,
                 "performer": "Smallpools",
                 "album": "Lovetap!"
               },
@@ -209,7 +207,6 @@ class PlaylistResourceIT extends IntegrationTestBase {
             "title": "American Love",
             "duration": 179,
             "offlineAvailable": true,
-            "playCount": 0,
             "performer": "Smallpools",
             "album": "Lovetap!"
           }
@@ -230,7 +227,6 @@ class PlaylistResourceIT extends IntegrationTestBase {
                 "title": "American Love",
                 "duration": 179,
                 "offlineAvailable": true,
-                "playCount": 0,
                 "performer": "Smallpools",
                 "album": "Lovetap!"
               }

@@ -27,7 +27,7 @@ public class Track {
 	private Album album;
 
 	// Video
-	private int playCount;
+	private Integer playCount;
 	private LocalDate publicationDate;
 	private String description;
 
@@ -54,7 +54,7 @@ public class Track {
 		boolean offlineAvailable,
 		Album album
 	) {
-		this(title, performer, duration, offlineAvailable, album, 0, null, null);
+		this(title, performer, duration, offlineAvailable, album, null, null, null);
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class Track {
 	  int duration,
 	  boolean offlineAvailable,
 	  Album album,
-	  int playCount,
+	  Integer playCount,
 	  LocalDate publicationDate,
 	  String description
 	) {
@@ -149,7 +149,7 @@ public class Track {
 	}
 
 	@PositiveOrZero
-	public int getPlayCount() {
+	public Integer getPlayCount() {
 		return playCount;
 	}
 
@@ -177,7 +177,7 @@ public class Track {
 			   && Objects.equals(getId(), track.getId())
 			   && getDuration() == track.getDuration()
 			   && isOfflineAvailable() == track.isOfflineAvailable()
-			   && getPlayCount() == track.getPlayCount()
+			   && Objects.equals(getPlayCount(), track.getPlayCount())
 			   && Objects.equals(getTitle(), track.getTitle())
 			   && Objects.equals(getPerformer(), track.getPerformer())
 			   && Objects.equals(getAlbum(), track.getAlbum())

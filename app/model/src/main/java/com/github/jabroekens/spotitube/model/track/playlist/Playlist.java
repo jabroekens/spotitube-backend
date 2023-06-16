@@ -22,7 +22,9 @@ public class Playlist {
 	private Integer id;
 	private String name;
 	private User owner;
-	private final List<Track> tracks;
+
+	@SuppressWarnings("FieldMayBeFinal")
+	private List<Track> tracks;
 
 	/**
 	 * @deprecated Internal no-args constructor used by framework.
