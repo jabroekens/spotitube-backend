@@ -14,7 +14,8 @@ services:
       context: ..
       dockerfile: docker/backend/Dockerfile
     environment:
-      JAVA_TOOL_OPTIONS: -javaagent:lib/jacocoagent.jar=output=tcpserver,address=* -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      # JAVA_TOOL_OPTIONS: -javaagent:lib/jacocoagent.jar=output=tcpserver,address=* -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
     ports:
       - '8080:8080'
       - '8443:8443'

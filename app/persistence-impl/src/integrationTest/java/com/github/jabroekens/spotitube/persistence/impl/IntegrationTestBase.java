@@ -2,6 +2,7 @@ package com.github.jabroekens.spotitube.persistence.impl;
 
 import java.util.Optional;
 import javax.sql.DataSource;
+import org.junit.jupiter.api.BeforeEach;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -18,6 +19,11 @@ abstract class IntegrationTestBase {
       .withUsername("postgres")
       .withPassword("postgres")
       .withFileSystemBind("../../docker/db/", "/docker-entrypoint-initdb.d/");
+
+    @BeforeEach
+    void waitUntilReady() throws InterruptedException {
+        Thread.sleep(2000);
+    }
 
     protected DataSource getDataSource() {
         var ds = new PGSimpleDataSource();

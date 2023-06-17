@@ -11,7 +11,7 @@ plugins {
 dependencies {
 	implementation(project(":app:service-api"))
 	runtimeOnly(project(":app:service-impl"))
-	runtimeOnly(project(":app:persistence-impl"))
+	runtimeOnly(project(":app:persistence-impl-jpa"))
 
 	implementation("jakarta.inject:jakarta.inject-api")
 	implementation("jakarta.ws.rs:jakarta.ws.rs-api")

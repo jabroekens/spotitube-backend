@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="https://jakarta.ee/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence/orm https://jakarta.ee/xml/ns/persistence/orm/orm_3_0.xsd"
+                 version="3.0">
+    <entity class="com.github.jabroekens.spotitube.model.user.User" name="User" access="FIELD">
+        <table name='"User"'/>
+        <inheritance strategy="JOINED"/>
+        <attributes>
+            <id name="id"/>
+            <basic name="passwordHash"/>
+            <basic name="name"/>
+        </attributes>
+    </entity>
+
+    <entity class="com.github.jabroekens.spotitube.model.track.Performer" name="Performer" access="FIELD"/>
+
+    <entity class="com.github.jabroekens.spotitube.model.track.Album" name="Album" access="FIELD">
+        <attributes>
+            <id name="name"/>
+        </attributes>
+    </entity>
+
+    <entity class="com.github.jabroekens.spotitube.model.track.Track" name="Track" access="FIELD">
+        <attributes>
+            <id name="id">
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="title"/>
+            <basic name="duration"/>
+            <basic name="offlineAvailable"/>
+
+            <basic name="playCount"/>
+            <basic name="publicationDate"/>
+            <basic name="description"/>
+
+            <one-to-one name="performer">
+                <join-column name="performer" referenced-column-name="id"/>
+            </one-to-one>
+
+            <one-to-one name="album">
+                <join-column name="album" referenced-column-name="name"/>
+            </one-to-one>
+        </attributes>
+    </entity>
+
+    <entity class="com.github.jabroekens.spotitube.model.track.playlist.Playlist" name="Playlist" access="FIELD">
+        <attributes>
+            <id name="id">
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="name"/>
+            <one-to-one name="owner">
+                <join-column name="owner"/>
+            </one-to-one>
+            <many-to-many name="tracks">
+                <join-table name="playlisttrack">
+                    <join-column name="playlist"/>
+                    <inverse-join-column name="track"/>
+                </join-table>
+            </many-to-many>
+        </attributes>
+    </entity>
+</entity-mappings>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
+    <persistence-unit name="SpotitubeDb">
+        <jta-data-source>SpotitubeDb</jta-data-source>
+
+        <class>com.github.jabroekens.spotitube.model.user.User</class>
+        <class>com.github.jabroekens.spotitube.model.track.Performer</class>
+        <class>com.github.jabroekens.spotitube.model.track.Album</class>
+        <class>com.github.jabroekens.spotitube.model.track.Track</class>
+        <class>com.github.jabroekens.spotitube.model.track.playlist.Playlist</class>
+    </persistence-unit>
+</persistence>
