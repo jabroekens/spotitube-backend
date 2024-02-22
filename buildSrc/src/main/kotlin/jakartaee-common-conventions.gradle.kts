@@ -1,4 +1,4 @@
-val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+val libs = versionCatalogs.named("libs")
 
 plugins {
 	id("java-common-conventions")

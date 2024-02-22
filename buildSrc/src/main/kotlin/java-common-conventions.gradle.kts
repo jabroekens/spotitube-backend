@@ -1,4 +1,4 @@
-val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+val libs = versionCatalogs.named("libs")
 val javaVersion = libs.findVersion("java").get().requiredVersion
 val junitJupiterVersion = libs.findVersion("junit-jupiter").get().requiredVersion
 
