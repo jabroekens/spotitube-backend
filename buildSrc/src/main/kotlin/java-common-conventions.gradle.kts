@@ -27,7 +27,7 @@ java {
 
 testing {
 	suites {
-		withType<JvmTestSuite> {
+		withType<JvmTestSuite>().configureEach {
 			useJUnitJupiter(junitJupiterVersion)
 		}
 
@@ -51,19 +51,20 @@ testing {
 }
 
 tasks {
-	val integrationTest by named("integrationTest")
-
-	withType<JavaCompile> {
+	withType<JavaCompile>().configureEach {
 		options.encoding = "UTF-8"
 	}
 
-	withType<Javadoc> {
+	withType<Javadoc>().configureEach {
 		options.encoding = "UTF-8"
 	}
 
-	val tests = withType<Test> {
+	val tests = withType<Test>()
+	tests.configureEach {
 		finalizedBy(jacocoTestReport)
 	}
+
+	val integrationTest by named("integrationTest")
 
 	check {
 		dependsOn(integrationTest)
