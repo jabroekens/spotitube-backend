@@ -54,13 +54,7 @@ tasks {
 	val integrationTest by named("integrationTest")
 
 	withType<JavaCompile> {
-		sourceCompatibility = javaVersion
-		targetCompatibility = javaVersion
-
-		options.apply {
-			release.set(javaVersion.toInt())
-			encoding = "UTF-8"
-		}
+		options.encoding = "UTF-8"
 	}
 
 	withType<Javadoc> {
